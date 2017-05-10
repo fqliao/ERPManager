@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.evaluate.EvaluateOrderXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+	<insert id="addEvaluateOrder" parameterType="EvaluateOrder">
+		insert into evaluateorder (auid, orderid)
+		values                    (#{auId}, #{orderId});
+	</insert>
+
+	<update id="updateQevaluate" parameterType="QEvaluateTime">
+		update evaluateorder set qevaluate = '是' where orderid in (select t.orderid from
+		(select o.orderid from evaluateorder as e inner join orderinfo as o on e.auid = o.auid and e.orderid = o.orderid and e.qevaluate = '否'
+		and o.deliverytime between #{qstartTime} and #{qevaluatetime} and e.auid = #{auId}) as t)
+	</update>
+
+	<update id="updateYevaluate" parameterType="YEvaluateTime">
+		update evaluateorder set yevaluate = '是' where orderid in (select t.orderid from
+		(select o.orderid from evaluateorder as e inner join orderinfo as o on e.auid = o.auid and e.orderid = o.orderid and e.yevaluate = '否'
+		and o.deliverytime between #{ystartTime} and #{yevaluatetime} and e.auid = #{auId}) as t)
+	</update>
+
+</mapper>

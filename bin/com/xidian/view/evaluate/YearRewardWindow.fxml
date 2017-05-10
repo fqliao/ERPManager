@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="294.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.evaluate.YearRewardController">
+   <children>
+      <GridPane layoutX="11.0" layoutY="28.0" prefHeight="185.0" prefWidth="379.0" AnchorPane.topAnchor="28.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="127.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="284.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="授权号" />
+            <Label text="年度奖励开始日期" GridPane.rowIndex="2" />
+            <Label text="年度奖励结束日期" GridPane.rowIndex="3" />
+            <TextField fx:id="auId2Field" editable="false" GridPane.columnIndex="1" />
+            <TextField fx:id="ystartTimeField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="yevaluatetimeField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="姓名" GridPane.rowIndex="1" />
+            <TextField fx:id="name2Field" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         </children>
+      </GridPane>
+      <Button layoutX="150.0" layoutY="232.0" mnemonicParsing="false" onAction="#handleYEvaluateSelect" prefHeight="24.0" prefWidth="102.0" text="奖励" AnchorPane.topAnchor="232.0" />
+   </children>
+</AnchorPane>

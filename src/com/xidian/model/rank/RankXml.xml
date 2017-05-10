@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.rank.RankXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+	<insert id="addRank" parameterType="Rank">
+		insert into rank (rank, productnum, productprice, productsum, createtime, updatetime)
+		          values (#{rank}, #{productNum}, #{productPrice}, #{productSum}, #{createtime}, #{updatetime});
+	</insert>
+
+	<update id="updateRank" parameterType="Rank">
+		update rank set productnum = #{productNum}, productprice = #{productPrice}, productsum = #{productSum}, updatetime = #{updatetime}
+		            where rank = #{rank};
+	</update>
+
+	<delete id="deleteRank" parameterType="String">
+		delete from rank where rank = #{rank};
+	</delete>
+
+	<select id="getCount" parameterType="String" resultType="int">
+		select count(id) from rank where rank = #{rank};
+	</select>
+
+	<select id="getRank" parameterType="String" resultType="Rank">
+		select * from rank where rank like #{rank};
+	</select>
+
+	<select id="getAllRank" resultType="Rank">
+		select * from rank;
+	</select>
+
+	<select id="getRankOfRank" resultType="String">
+		select rank from rank;
+	</select>
+
+</mapper>

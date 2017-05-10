@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="800.0" prefWidth="1175.0" styleClass="background" stylesheets="@manager.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.MainController">
+   <children>
+      <SplitPane dividerPositions="0.065" layoutX="145.0" layoutY="68.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <items>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefWidth="176.0">
+               <children>
+                  <Accordion layoutY="14.0" minWidth="176.0" prefHeight="398.0" prefWidth="176.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <panes>
+                      <TitledPane animated="false" text="订单管理">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleNewOrder" prefHeight="23.0" prefWidth="176.0" text="新建订单" />
+                                    <Button layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleQueryOrder" prefHeight="23.0" prefWidth="176.0" text="查询订单" AnchorPane.topAnchor="15.0" />
+                                 </children>
+                           </AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <TitledPane animated="false" prefWidth="176.0" text="客户管理">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleNewCustomer" prefHeight="23.0" prefWidth="176.0" text="新建客户" />
+                                    <Button fx:id="queryAndEditCustomerButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleQueryCustomer" prefHeight="23.0" prefWidth="176.0" text="查询修改客户" />
+                                 </children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                      <!-- <TitledPane animated="false" text="客户考核">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleQevaluate" prefHeight="23.0" prefWidth="176.0" text="90天考核" />
+                                    <Button layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleYevaluate" prefHeight="23.0" prefWidth="176.0" text="年度奖励" />
+                                 </children></AnchorPane>
+                        </content>
+                      </TitledPane> -->
+                      <TitledPane animated="false" prefWidth="176.0" text="地址管理">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleNewAddress" prefHeight="23.0" prefWidth="176.0" text="新建收件地址" />
+                                    <Button fx:id="queryAndEditAddressButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleQueryAddress" prefHeight="23.0" prefWidth="176.0" text="查询修改收件地址" />
+                                 </children></AnchorPane>
+                        </content>
+                      </TitledPane>
+                        <TitledPane fx:id="rankTitledPane" animated="false" prefWidth="176.0" text="级别管理">
+                           <content>
+                              <AnchorPane minHeight="0.0" minWidth="0.0">
+                                 <children>
+                                    <Button fx:id="newRankButton" layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleNewRank" prefHeight="23.0" prefWidth="176.0" text="新建级别" />
+                                    <Button fx:id="queryRankButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleQueryRank" prefHeight="23.0" prefWidth="176.0" text="查询修改级别" />
+                                 </children>
+                              </AnchorPane>
+                           </content>
+                        </TitledPane>
+                        <TitledPane animated="false" text="信息变更查询">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleQueryUpdateInfo" prefHeight="23.0" prefWidth="176.0" text="查询客户信息变更" />
+                                    <!-- <Button layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleBalanceUpdate" prefHeight="23.0" prefWidth="176.0" text="查询余额信息变更" /> -->
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </TitledPane>
+                      <!-- <TitledPane animated="false" text="客户统计">
+                        <content>
+                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                        </content>
+                      </TitledPane> -->
+                        <TitledPane animated="false" text="系统设置">
+                          <content>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                 <children>
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlePasswordChange" prefHeight="23.0" prefWidth="176.0" text="密码修改" />
+                                    <Button fx:id="newManagerUserButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleNewManagerUser" prefHeight="23.0" prefWidth="176.0" text="注册用户" />
+                                    <Button fx:id="queryAndEditManagerUserButton" layoutX="-7.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefHeight="23.0" prefWidth="176.0" text="查询修改用户" />
+                                 </children>
+                              </AnchorPane>
+                          </content>
+                        </TitledPane>
+                    </panes>
+                  </Accordion>
+               </children></AnchorPane>
+          <AnchorPane fx:id="anchorPaneContent" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+               <children>
+                  <Label layoutX="434.0" layoutY="280.0" text="欢迎使用" textFill="#2dd378">
+                     <font>
+                        <Font size="72.0" />
+                     </font>
+                  </Label>
+               </children></AnchorPane>
+        </items>
+      </SplitPane>
+   </children>
+</AnchorPane>

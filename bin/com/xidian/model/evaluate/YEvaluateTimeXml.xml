@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.evaluate.YEvaluateTimeXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+
+	<select id="getYEvaluateNumByAuid" parameterType="String" resultType="int">
+		select count(id) from yevaluatetime where auid = #{auId};
+	</select>
+
+	<!-- 插入记录考核时间，用存储过程实现 -->
+	<select id="addEvaluateTime"  statementType="CALLABLE" parameterType="QEvaluateTime">
+		call evaluate_time(#{auId}, #{rank}, #{customerName}, #{qstartTime});
+	</select>
+
+	<select id="getIsAddYEvaluateTime" parameterType="QEvaluateTime" resultType="int">
+		select count(id) from yevaluatetime where auid = #{auId} and isyevaluate = '否' and #{qstartTime} >  yevaluatetime;
+	</select>
+
+	<select id="getYEvaluateTimeByAuidAndYevaluateTime" parameterType="YEvaluateTime" resultType="int">
+		select count(auid) from yevaluatetime where auid = #{auId} and yevaluatetime > #{ystartTime};
+	</select>
+
+	<select id="getYEvaluateByAuId" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where auid = #{auId}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '否' and y.auid like #{auId} <![CDATA[and y.yevaluatetime <= now()]]> group by y.ystarttime;
+	</select>
+
+	<select id="getYEvaluateByName" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where customername = #{name}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '否' and y.customername like #{customerName} <![CDATA[and y.yevaluatetime <= now()]]> group by y.ystarttime;
+	</select>
+
+	<select id="getYEvaluateByRank" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where rank = #{rank}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '否' and y.rank = #{rank} <![CDATA[and y.yevaluatetime <= now()]]> group by y.ystarttime;
+	</select>
+
+	<select id="getYEvaluateByAll"  resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where isyevaluate ='否' ; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '否' <![CDATA[and y.yevaluatetime <= now()]]> group by y.ystarttime;
+	</select>
+	<select id="getFYEvaluateByAuId" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where auid = #{auId}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '是' and y.auid like #{auId} group by y.ystarttime;
+	</select>
+		<select id="getFYEvaluateByName" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where customername = #{name}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '是' and y.customername like #{customerName} group by y.ystarttime;
+	</select>
+
+	<select id="getFYEvaluateByRank" parameterType="String" resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where rank = #{rank}; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '是' and y.rank = #{rank} group by y.ystarttime;
+	</select>
+
+	<select id="getFYEvaluateByAll"  resultType="YEvaluateTime">
+		<!-- select * from yevaluatetime where isyevaluate ='否' ; -->
+		select y.* from qevaluatetime as q inner join yevaluatetime y
+		on q.auid = y.auid
+		<![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and q.isqevaluate = '是' and y.isyevaluate = '是' group by y.ystarttime;
+	</select>
+
+	<!-- 对单个客户进行年度统计 -->
+	<select id="getYevaluateNUM" parameterType="YEvaluateTime" resultType="YEvaluateTime">
+		select q.auid, q.rank, sum(q.productnum) as xproductnum from qevaluatetime as q
+		inner join yevaluatetime y on
+		q.auid = y.auid <![CDATA[ and q.qstarttime >= y.ystarttime and q.qevaluatetime <= y.yevaluatetime  ]]>
+		and y.isyevaluate = '否' and q.auid = #{auId}
+		group by q.rank;
+	</select>
+
+	<update id="updateYEvaluateTime" parameterType="YEvaluateTime">
+		update yevaluatetime set isyevaluate = '是',
+		xproductnum = #{xproductNum}, sproductnum = #{sproductNum}, xbalance = #{xbalance},
+		sbalance = #{sbalance}, balance = #{balance}, xspent = #{xspent},
+		sspent = #{sspent}, spent = #{spent}, profit = #{profit}
+		where id = #{id};
+
+	</update>
+</mapper>

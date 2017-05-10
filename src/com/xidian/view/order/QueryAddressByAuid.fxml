@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.order.NewOrderController">
+   <children>
+      <TableView fx:id="addressTable" layoutX="19.0" layoutY="42.0" prefHeight="400.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <columns>
+          <TableColumn fx:id="auidColumn" prefWidth="75.0" text="授权号" />
+            <TableColumn fx:id="receiverNameColumn" prefWidth="102.0" text="收件人姓名" />
+            <TableColumn fx:id="receiverPhoneColumn" prefWidth="75.0" text="收件人电话" />
+            <TableColumn fx:id="receiverAddressColumn" prefWidth="97.0" text="收件地址" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </children>
+</AnchorPane>

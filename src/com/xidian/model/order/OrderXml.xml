@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.order.OrderXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+ 	<select id="getOrderByOrderId" parameterType="String" resultType="Order">
+		select orderinfo.*, customer.code code from orderinfo, customer where orderid like #{orderId} and orderinfo.auid = customer.auid;
+	</select>
+
+ 	<select id="getOrderByAuId" parameterType="String" resultType="Order">
+		select orderinfo.*, customer.code code from orderinfo, customer where orderinfo.auid like #{auId} and orderinfo.auid = customer.auid;
+	</select>
+
+	<select id="getOrderCountByAuid" parameterType="QEvaluateTime" resultType="Integer">
+		select count(auid) from orderinfo where auid = #{auId} <![CDATA[and deliveryTime >= #{qstartTime} and deliveryTime <= #{qevaluatetime}]]>;
+	</select>
+
+<!--  	<select id="getCustomerByRank" parameterType="String" resultType="Customer">
+		select * from customer where rank = #{rank};
+	</select> -->
+
+	<select id="getOrderAll"  resultType="Order">
+		select orderinfo.*, customer.code code from orderinfo, customer where orderinfo.auid = customer.auid;;
+	</select>
+
+<!-- 	<select id="getAllCustomer" resultType="Customer">
+		select customer.*, balance from customer inner join balance on customer.auid = balance.auid;
+	</select>  -->
+
+	<insert id="addOrder" parameterType="Order">
+		insert into orderinfo (auid,    rank,    deliverytime,    deliveryname,    orderid,    productid,    productnum,    productprice,   productsum,  receivername,    receiverphone,    receiveraddress, waybillnumber, express)
+		values               (#{auId}, #{rank}, #{deliveryTime}, #{deliveryName}, #{orderId}, #{productId}, #{productNum}, #{productPrice}, #{productSum}, #{receiverName}, #{receiverPhone}, #{receiverAddress},#{wayBillNumber}, #{express});
+	</insert>
+
+<!-- 	<update id="updateCustomer" parameterType="Customer">
+		update customer set rank = #{rank}, customername = #{customerName}, sex = #{sex}, age = #{age}, idcard = #{idcard}, area = #{area}, address = #{address}, phone = #{phone}, qq = #{qq}, weixin = #{weixin}
+		where id = #{id};
+	</update>
+
+	<update id="updateCustomerOfState" parameterType="Customer">
+		update customer set state = #{state}
+		where auid = #{auid};
+	</update> -->
+
+	<select id="getOrderByUser" parameterType="Order" resultType="Order">
+		select orderinfo.*, customer.code code from orderinfo, customer where deliveryname = #{deliveryName} and orderinfo.auid = customer.auid
+		<if test="orderId != ''">
+			and orderid like #{orderId}
+		</if>
+		<if test="auId != ''">
+			and orderinfo.auid like #{auId}
+		</if>
+	</select>
+
+	<select id="getOrder" parameterType="Order" resultType="Order">
+		select orderinfo.*, customer.code code from orderinfo, customer where orderinfo.auid = customer.auid
+		<if test="deliveryName != ''">
+			and deliveryname like #{deliveryName}
+		</if>
+		<if test="receiverName != ''">
+			and receivername like #{receiverName}
+		</if>
+		<if test="orderId != ''">
+			and orderid like #{orderId}
+		</if>
+		<if test="auId != ''">
+			and orderinfo.auid like #{auId}
+		</if>
+		<if test="startDate != null">
+			and orderinfo.deliverytime >= #{startDate}
+		</if>
+		<if test="endDate != null">
+			<![CDATA[and orderinfo.deliverytime <= #{endDate}]]>
+		</if>
+	</select>
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!-- 数据库配置文件 -->
+	<properties resource="db.properties"></properties>
+
+	<typeAliases><!-- 配置实体类的包名，在mapper.xml文件中实体类就可以不写包名了 -->
+		<package name="com.xidian.model"/>
+	</typeAliases>
+
+	<typeHandlers> <!-- 要注意配置顺序 -->
+		<typeHandler handler="com.xidian.util.LocalDateTypeHandler"/>
+		<typeHandler handler="com.xidian.util.LocalDateTimeTypeHandler"/>
+	</typeHandlers>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${driver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+
+	<mappers>
+		<mapper resource="com/xidian/model/system/ManagerUserXml.xml"/>
+		<mapper resource="com/xidian/model/customer/CustomerXml.xml"/>
+		<mapper resource="com/xidian/model/balance/BalanceXml.xml"/>
+		<mapper resource="com/xidian/model/balance/UpdateBalanceXml.xml"/>
+		<mapper resource="com/xidian/model/updateinfo/UpdateInfoXml.xml"/>
+		<mapper resource="com/xidian/model/address/AddressXml.xml"/>
+		<mapper resource="com/xidian/model/order/OrderXml.xml"/>
+		<mapper resource="com/xidian/model/evaluate/EvaluateOrderXml.xml"/>
+		<mapper resource="com/xidian/model/evaluate/QEvaluateTimeXml.xml"/>
+		<mapper resource="com/xidian/model/evaluate/YEvaluateTimeXml.xml"/>
+		<mapper resource="com/xidian/model/rank/RankXml.xml"/>
+	</mappers>
+
+</configuration>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.UpdateBalanceXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+	<insert id="addUpdateBalance" parameterType="UpdateBalance">
+		insert into updatebalance (auid, rank, prebalance,   updatebalance,      posbalance,     updatetime, updatereason)
+		values                 (#{auid}, #{rank}, #{preBalance}, #{updateBalance}, #{posBalance}, #{updateTime}, #{updateReason});
+	</insert>
+
+	<select id="getBalanceByAuid" parameterType="String" resultType="UpdateBalance">
+		select u.*, c.customername as customername, c.rank as rank from updatebalance as u inner join customer as c on
+		u.auid = c.auid and u.auid like #{auid};
+	</select>
+	<select id="getBalanceByName" parameterType="String" resultType="UpdateBalance">
+		select u.*, c.customername as customername, c.rank as rank from updatebalance as u inner join customer as c on
+		u.auid = c.auid and c.customername like #{customername};
+	</select>
+	<select id="getBalanceByRank" parameterType="String" resultType="UpdateBalance">
+		select u.*, c.customername as customername, c.rank as rank from updatebalance as u inner join customer as c on
+		u.auid = c.auid and c.rank = #{rank};
+	</select>
+	<select id="getBalanceByAll"  resultType="UpdateBalance">
+		select u.*, c.customername as customername from updatebalance as u inner join customer as c on
+		u.auid = c.auid ;
+	</select>
+		<select id="getBalanceByNameAndRank" parameterType="UpdateBalance" resultType="UpdateBalance">
+		select u.*, c.customername as customername from updatebalance as u inner join customer as c on
+		u.auid = c.auid and c.customername like #{customerName} and u.rank = #{rank};
+	</select>
+
+
+</mapper>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="415.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.balance.CustomerBalanceUpdateController">
+   <children>
+      <GridPane layoutX="3.0" layoutY="28.0" prefHeight="334.0" prefWidth="379.0" AnchorPane.topAnchor="28.0">
+        <columnConstraints>
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="127.0" />
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="284.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="100.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label text="授权号" />
+            <Label text="代理级别" GridPane.rowIndex="2" />
+            <Label text="更新前余额(元)" GridPane.rowIndex="3" />
+            <Label text="更新数量(元)" GridPane.rowIndex="4" />
+            <TextField fx:id="auId2Field" editable="false" prefHeight="30.0" GridPane.columnIndex="1" />
+            <TextField fx:id="preBalanceField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="rankField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="updateBalanceField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <Label text="姓名" GridPane.rowIndex="1" />
+            <TextField fx:id="name2Field" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="更新后余额(元)" GridPane.rowIndex="5" />
+            <Label text="更新时间" GridPane.rowIndex="6" />
+            <Label text="更新原因" GridPane.rowIndex="7" />
+            <TextField fx:id="posBalanceField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="updateTimeField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+            <TextArea fx:id="updateReasonField" editable="false" prefHeight="82.0" prefWidth="268.0" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+         </children>
+      </GridPane>
+      <Button layoutX="149.0" layoutY="376.0" mnemonicParsing="false" onAction="#handleBalanceSelect" prefHeight="24.0" prefWidth="102.0" text="关闭" AnchorPane.topAnchor="376.0" />
+      <TextField fx:id="createTimeField" layoutX="10.0" layoutY="340.0" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
+      <ComboBox fx:id="rankBox" layoutX="11.0" layoutY="267.0" prefWidth="50.0" visible="false" AnchorPane.leftAnchor="0.0" />
+   </children>
+</AnchorPane>

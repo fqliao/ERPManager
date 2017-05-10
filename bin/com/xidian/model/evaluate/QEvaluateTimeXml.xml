@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.evaluate.QEvaluateTimeXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+
+	<select id="getQevaluateByAuId" parameterType="String" resultType="QEvaluateTime">
+
+		select * from qevaluatetime where auid = #{auId} and isqevaluate ='否';
+	</select>
+
+	<select id="getQevaluateByAuId2" parameterType="String" resultType="QEvaluateTime">
+
+		select * from qevaluatetime where auid like #{auId} and isqevaluate ='否'<![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+
+	<select id="getQevaluateByName" parameterType="String" resultType="QEvaluateTime">
+		select * from qevaluatetime where customername like #{name} and isqevaluate ='否' <![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+	<select id="getQevaluateByRank" parameterType="String" resultType="QEvaluateTime">
+		select * from qevaluatetime where rank = #{rank} and isqevaluate ='否' <![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+	<select id="getQevaluateByRankAndName" parameterType="QEvaluateTime" resultType="QEvaluateTime">
+		select * from qevaluatetime where rank = #{rank} and isqevaluate ='否' and customername like #{customerName}<![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+	<select id="getQevaluateByAll"  resultType="QEvaluateTime">
+		select * from qevaluatetime where isqevaluate ='否' <![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+	<select id="getFQevaluateByAuId" parameterType="String" resultType="QEvaluateTime">
+		select * from qevaluatetime where auid like #{auId} and isqevaluate ='是';
+	</select>
+
+	<select id="getFQevaluateByName" parameterType="String" resultType="QEvaluateTime">
+		select * from qevaluatetime where customername like #{name} and isqevaluate ='是';
+	</select>
+
+	<select id="getFQevaluateByRank" parameterType="String" resultType="QEvaluateTime">
+		select * from qevaluatetime where rank = #{rank} and isqevaluate ='是';
+	</select>
+
+	<select id="getFQevaluateByAll"  resultType="QEvaluateTime">
+		select * from qevaluatetime where isqevaluate ='是' ;
+	</select>
+
+	<select id="getFQevaluateByRankAndName" parameterType="QEvaluateTime" resultType="QEvaluateTime">
+		select * from qevaluatetime where rank = #{rank} and isqevaluate ='是' and customername like #{customerName}<![CDATA[and qevaluatetime <= now()]]>;
+	</select>
+
+	<select id="getQevaluateProductNum" parameterType="QEvaluateTime" resultType="Integer">
+		select sum(t.productnum) from (select o.auid, o.productnum, o.deliverytime, e.qevaluate from
+		evaluateorder as e inner join orderinfo as o on e.auid = o.auid and e.orderid = o.orderid and e.qevaluate = '否'
+		and o.deliverytime between #{qstartTime} and #{qevaluatetime} and e.auid = #{auId}) as t group by auid;
+	</select>
+
+	<update id="updateQEvaluateTime" parameterType="QEvaluateTime">
+		update qevaluatetime set isqevaluate = "是", productnum = #{productNum}, price = #{price}, balance = #{balance} where id = #{id}
+	</update>
+
+	<update id="updateQEvaluateTimeRank" parameterType="QEvaluateTime">
+		update qevaluatetime set rank = #{rank} where auid = #{auId} and qstarttime >= #{qevaluatetime};
+	</update>
+
+</mapper>
