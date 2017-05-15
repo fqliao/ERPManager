@@ -17,6 +17,7 @@ public class Rank implements Comparable<Rank>{
 	private final IntegerProperty productNum;
 	private final IntegerProperty productPrice;
 	private final IntegerProperty productSum;
+	private final StringProperty producttype;
 	private final ObjectProperty<LocalDateTime> createtime;
 	private final ObjectProperty<LocalDateTime> updatetime;
 
@@ -26,6 +27,7 @@ public class Rank implements Comparable<Rank>{
 		this.productNum = new SimpleIntegerProperty();
 		this.productPrice = new SimpleIntegerProperty();
 		this.productSum = new SimpleIntegerProperty();
+		this.producttype = new SimpleStringProperty();
 		this.createtime = new SimpleObjectProperty<LocalDateTime>();
 		this.updatetime = new SimpleObjectProperty<LocalDateTime>();
 	}
@@ -72,6 +74,15 @@ public class Rank implements Comparable<Rank>{
 	}
 	public void setRank(String rank) {
 		this.rank.set(rank);
+	}
+	public String getProducttype() {
+		return producttype.get();
+	}
+	public StringProperty producttypeProperty(){
+		return producttype;
+	}
+	public void setProducttype(String producttype) {
+		this.producttype.set(producttype);
 	}
 	public int getProductNum() {
 		return productNum.get();

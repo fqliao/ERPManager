@@ -38,6 +38,7 @@
 		<mapper resource="com/xidian/model/evaluate/QEvaluateTimeXml.xml"/>
 		<mapper resource="com/xidian/model/evaluate/YEvaluateTimeXml.xml"/>
 		<mapper resource="com/xidian/model/rank/RankXml.xml"/>
+		<mapper resource="com/xidian/model/product/ProductXml.xml"/>
 	</mappers>
 
 </configuration>

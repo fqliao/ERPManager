@@ -3,33 +3,63 @@
 <mapper namespace="com.xidian.model.rank.RankXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
 
 	<insert id="addRank" parameterType="Rank">
-		insert into rank (rank, productnum, productprice, productsum, createtime, updatetime)
-		          values (#{rank}, #{productNum}, #{productPrice}, #{productSum}, #{createtime}, #{updatetime});
+		insert into rank (rank, productnum, productprice, productsum, createtime, updatetime, producttype)
+		          values (#{rank}, #{productNum}, #{productPrice}, #{productSum}, #{createtime}, #{updatetime}, #{producttype});
 	</insert>
 
 	<update id="updateRank" parameterType="Rank">
-		update rank set productnum = #{productNum}, productprice = #{productPrice}, productsum = #{productSum}, updatetime = #{updatetime}
-		            where rank = #{rank};
+		update rank set productnum = #{productNum}, productprice = #{productPrice}, productsum = #{productSum}, createtime = #{createtime}, updatetime = #{updatetime}
+		            where rank = #{rank} and producttype = #{producttype};
 	</update>
 
-	<delete id="deleteRank" parameterType="String">
-		delete from rank where rank = #{rank};
+	<update id="updateRankByProduct" parameterType="Product">
+		update rank set producttype = #{producttype}
+		            where producttype = #{oldproducttype};
+	</update>
+
+	<delete id="deleteRankByProduct" parameterType="Product">
+		delete from rank where producttype = #{producttype};
+	</delete>
+
+	<delete id="deleteRank" parameterType="Rank">
+		delete from rank where rank = #{rank} and  producttype = #{producttype};
 	</delete>
 
 	<select id="getCount" parameterType="String" resultType="int">
 		select count(id) from rank where rank = #{rank};
 	</select>
 
-	<select id="getRank" parameterType="String" resultType="Rank">
-		select * from rank where rank like #{rank};
+	<select id="getCountByProductAndRankname" parameterType="Rank" resultType="int">
+		select count(id) from rank where rank = #{rank} and producttype = #{producttype};
+	</select>
+
+	<select id="getRank" parameterType="Rank" resultType="Rank">
+		select * from rank where 1 = 1
+		<if test="rank != ''">
+			and rank = #{rank}
+		</if>
+		<if test="producttype != ''">
+			and producttype = #{producttype}
+		</if>
 	</select>
 
 	<select id="getAllRank" resultType="Rank">
 		select * from rank;
 	</select>
 
-	<select id="getRankOfRank" resultType="String">
-		select rank from rank;
+	<select id="getAllRankByProductTypr" parameterType="String" resultType="Rank">
+		select * from rank where producttype = #{productType};
 	</select>
 
+	<select id="getRankOfRank" resultType="String">
+		select distinct rank from rank;
+	</select>
+
+	<select id="getProductTypeByRank" parameterType="String" resultType="String" >
+		select producttype from rank where rank = #{customerRank};
+	</select>
+
+	<select id="getProductPriceByRankAndProductType" parameterType="Rank" resultType="Rank" >
+		select * from rank where rank = #{rank} and producttype = #{producttype};
+	</select>
 </mapper>

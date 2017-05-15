@@ -2,6 +2,7 @@ package com.xidian.view.rank;
 
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -9,11 +10,13 @@ import com.xidian.MainApp;
 import com.xidian.model.rank.Rank;
 import com.xidian.util.LocalDateTimeUtil;
 import com.xidian.util.MessageUtil;
+import com.xidian.util.MybatisUtils;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 
 /**
@@ -25,13 +28,16 @@ import javafx.scene.control.Label;
 public class NewRankController {
 
 	@FXML
-	private TextField rankField;
+	private ComboBox<String> rankBox;
 
 	@FXML
 	private TextField productNumField;
 
 	@FXML
 	private TextField productPriceField;
+
+	@FXML
+	private ComboBox<String> producttypeBox;
 
 	@FXML
 	private TextField productSumField;
@@ -53,6 +59,19 @@ public class NewRankController {
 
 	@FXML
 	private void initialize() {
+
+		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
+		List<String> productType;
+		productType = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
+		producttypeBox.getItems().addAll(productType);
+		producttypeBox.getSelectionModel().select(productType.get(0));
+
+		List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+		rankBox.getItems().removeAll(rankBox.getItems());
+		rankBox.getItems().addAll(ranks);
+		rankBox.getSelectionModel().selectFirst();
+
+		sqlSession.close();
 
 		if(productNumField != null)
 		{
@@ -128,9 +147,14 @@ public class NewRankController {
 	@FXML
 	private void handleSaveRank() {
 
-		String rankString = rankField.getText().trim();
+		String rankString = rankBox.getSelectionModel().getSelectedItem().trim();
 		String productNumString = productNumField.getText().trim();
 		String productPriceString =productPriceField.getText().trim();
+		String producttypeString = producttypeBox.getSelectionModel().getSelectedItem();
+
+		Rank rankTest = new Rank();
+		rankTest.setProducttype(producttypeString);
+		rankTest.setRank(rankString);
 
 		int productNum = 0;
 		int productPrice = 0;
@@ -146,7 +170,7 @@ public class NewRankController {
 		}
 		else{
 
-			int count = sqlSession.selectOne("com.xidian.model.rank.RankXml.getCount", rankString);
+			int count = sqlSession.selectOne("com.xidian.model.rank.RankXml.getCountByProductAndRankname", rankTest);
 			if(count != 0){
 				flag = false;
 				MessageUtil.alertInfo("该级别存在！");
@@ -201,12 +225,14 @@ public class NewRankController {
 			LocalDateTime now = LocalDateTimeUtil.getNow();
 			rank.setCreatetime(now);
 			rank.setUpdatetime(now);
+			rank.setProducttype(producttypeString);
 
 			int addRankResult = 0;
 			String message = "";
 
 			StringBuilder messageConfirm = new StringBuilder();
-			messageConfirm.append("级别：" + rankString);
+			messageConfirm.append("产品类别：" + producttypeString);
+			messageConfirm.append("\n级别：" + rankString);
 			messageConfirm.append("\n数量(元)：" + productNum);
 			messageConfirm.append("\n单价(元)：" + productPrice);
 			messageConfirm.append("\n货款(元)：" + productSum);
@@ -221,6 +247,7 @@ public class NewRankController {
 			catch(Exception e)
 			{
 				message = "保存失败!\n";
+				e.printStackTrace();
 			}
 			finally {
 				sqlSession.close();
@@ -228,7 +255,12 @@ public class NewRankController {
 			if (addRankResult == 1)
 			{
 				message = "保存成功!";
-				rankField.setText("");
+				SqlSession sqlSession2 = MybatisUtils.getSqlSession(true);
+				List<String> ranks = sqlSession2.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+				sqlSession2.close();
+				rankBox.getItems().removeAll(rankBox.getItems());
+				rankBox.getItems().addAll(ranks);
+				rankBox.getSelectionModel().selectFirst();
 				productNumField.setText("");
 				productPriceField.setText("");
 				productSumField.setText("");

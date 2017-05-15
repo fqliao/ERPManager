@@ -18,23 +18,26 @@
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="314.0" />
               </columnConstraints>
               <rowConstraints>
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="代理级别" />
-                  <Label text="数量(盒)" GridPane.rowIndex="1" />
-                  <Label text="货款(元)" GridPane.rowIndex="3" />
-                  <Label text="单价(元)" GridPane.rowIndex="2" />
-                  <TextField fx:id="rankField" prefHeight="30.0" GridPane.columnIndex="1" />
-                  <TextField fx:id="productNumField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <TextField fx:id="productPriceField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <TextField fx:id="productSumField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label text="代理级别" GridPane.rowIndex="1" />
+                  <Label text="数量(盒)" GridPane.rowIndex="2" />
+                  <Label text="货款(元)" GridPane.rowIndex="4" />
+                  <Label text="单价(元)" GridPane.rowIndex="3" />
+                  <TextField fx:id="productNumField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <TextField fx:id="productPriceField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <TextField fx:id="productSumField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                  <Label text="产品类型" />
+                  <ComboBox fx:id="producttypeBox" prefHeight="25.0" prefWidth="120.0" GridPane.columnIndex="1" />
+                  <ComboBox fx:id="rankBox" editable="true" prefHeight="25.0" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
-            <Button layoutX="179.0" layoutY="264.0" mnemonicParsing="false" onAction="#handleSaveRank" prefHeight="24.0" prefWidth="102.0" text="保存" />
+            <Button layoutX="179.0" layoutY="278.0" mnemonicParsing="false" onAction="#handleSaveRank" prefHeight="24.0" prefWidth="102.0" text="保存" />
          </children>
       </Group>
       <TextField fx:id="createTimeField" layoutX="10.0" layoutY="340.0" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />

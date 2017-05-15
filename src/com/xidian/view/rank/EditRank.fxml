@@ -9,29 +9,40 @@
 
 <AnchorPane prefHeight="320.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.rank.EditRankController">
    <children>
-      <GridPane layoutX="4.0" prefHeight="248.0" prefWidth="384.0">
+      <GridPane layoutX="4.0" prefHeight="264.0" prefWidth="384.0">
         <columnConstraints>
           <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="186.0" minWidth="10.0" prefWidth="67.0" />
           <ColumnConstraints hgrow="SOMETIMES" maxWidth="314.0" minWidth="10.0" prefWidth="314.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label text="代理级别" />
-            <Label text="数量(元)" GridPane.rowIndex="1" />
-            <Label text="单价(元)" GridPane.rowIndex="2" />
-            <Label text="货款(元)" GridPane.rowIndex="3" />
-            <TextField fx:id="productNumField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-            <TextField fx:id="productPriceField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-            <TextField fx:id="productSumField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <Label text="数量(元)" GridPane.rowIndex="2" />
+            <Label text="单价(元)" GridPane.rowIndex="3" />
+            <Label text="货款(元)" GridPane.rowIndex="4" />
+            <TextField fx:id="productNumField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <TextField fx:id="productPriceField" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <TextField fx:id="productSumField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
             <TextField fx:id="rankField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" />
+            <Label text="产品类型" GridPane.rowIndex="1" />
+            <TextField fx:id="producttypeField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+            <Label text="创建时间" GridPane.rowIndex="5" />
+            <Label text="更新时间" GridPane.rowIndex="6" />
+            <TextField fx:id="createtimeField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <TextField fx:id="updatetimeField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
          </children>
       </GridPane>
-      <Button fx:id="editRankButton" defaultButton="true" layoutX="113.0" layoutY="258.0" mnemonicParsing="false" onAction="#handleEditRank" prefHeight="24.0" prefWidth="102.0" text="修改" />
-      <Button fx:id="deleteRankButton" layoutX="236.0" layoutY="258.0" mnemonicParsing="false" onAction="#handleDeleteRank" prefHeight="24.0" prefWidth="102.0" text="删除" />
+
+      <Button fx:id="editRankButton" defaultButton="true" layoutX="89.0" layoutY="274.0" mnemonicParsing="false" onAction="#handleEditRank" prefHeight="24.0" prefWidth="102.0" text="修改" />
+      <Button fx:id="deleteRankButton" layoutX="212.0" layoutY="274.0" mnemonicParsing="false" onAction="#handleDeleteRank" prefHeight="24.0" prefWidth="102.0" text="删除" />
+
    </children>
 </AnchorPane>

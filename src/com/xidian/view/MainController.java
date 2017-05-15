@@ -41,6 +41,8 @@ public class MainController {
 	@FXML
 	private Button queryRankButton;
 
+	@FXML
+	private Button restoreButton;
 
 	public MainController() {
 
@@ -60,6 +62,7 @@ public class MainController {
 			queryRankButton.setLayoutY(3.0);
 			newManagerUserButton.setVisible(false);
 			queryAndEditManagerUserButton.setVisible(false);
+			restoreButton.setVisible(false);
 		}
 	}
 
@@ -195,5 +198,20 @@ public class MainController {
 	private void handleQueryManagerUser()
 	{
 		mainApp.showQueryManagerUser(anchorPaneContent);
+	}
+
+	/**
+	 * 打开产品类型设置界面
+	 */
+	@FXML
+	private void handleEditProductType()
+	{
+		mainApp.showEditProducType(anchorPaneContent);
+	}
+
+	@FXML
+	private void handleRestoreDB()
+	{
+		mainApp.showRestoreDB();
 	}
 }

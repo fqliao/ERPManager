@@ -11,6 +11,7 @@ import com.xidian.model.customer.Customer;
 import com.xidian.model.evaluate.QEvaluateTime;
 import com.xidian.model.evaluate.YEvaluateTime;
 import com.xidian.model.order.Order;
+import com.xidian.model.product.Product;
 import com.xidian.model.rank.Rank;
 import com.xidian.model.system.ManagerUser;
 import com.xidian.model.updateinfo.UpdateInfo;
@@ -34,9 +35,12 @@ import com.xidian.view.evaluate.QuarterEvaluateController;
 import com.xidian.view.evaluate.YearRewardController;
 import com.xidian.view.order.NewOrderController;
 import com.xidian.view.order.QueryOrderController;
+import com.xidian.view.product.EditProductTypeController;
+import com.xidian.view.product.ModifyAndDeleteProductTypeController;
 import com.xidian.view.rank.EditRankController;
 import com.xidian.view.rank.NewRankController;
 import com.xidian.view.rank.QueryRankController;
+import com.xidian.view.system.ConfirmPasswordController;
 import com.xidian.view.system.EditManagerUserController;
 import com.xidian.view.system.LoginController;
 import com.xidian.view.system.NewManagerUserController;
@@ -871,6 +875,127 @@ public class MainApp extends Application {
 
 
 	}
+	/**显示产品类型设置主界面
+	 * @param anchorPaneContent
+	 */
+	public void showModifyAndDeleteProduct(Product productSelect, EditProductTypeController newProductController) {
+		try
+		{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/product/ModifyAndDeleteProductType.fxml"));
+			AnchorPane page = (AnchorPane)loader.load();
 
+			Stage editStage = new Stage();
+			editStage.setTitle("修改删除产品");
+			editStage.initModality(Modality.WINDOW_MODAL);
+			editStage.initOwner(mainStage);
+			editStage.getIcons().add(new Image("file:resources/images/person.png"));
+			Scene scene = new Scene(page);
+			editStage.setScene(scene);
 
+			ModifyAndDeleteProductTypeController modifyAndDeleteProductController = loader.getController();
+			modifyAndDeleteProductController.setMainApp(this);
+			modifyAndDeleteProductController.setEditProductTypeController(newProductController);
+			modifyAndDeleteProductController.setProdectSelect(productSelect);
+			modifyAndDeleteProductController.setProductName(productSelect);
+			modifyAndDeleteProductController.setEditStage(editStage);
+
+			editStage.showAndWait();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+     * 增添新的产品类型弹窗界面
+     * @param editProductController
+     */
+	public void showAddProduct(EditProductTypeController newProductController)
+	{
+		try
+		{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/product/NewProductType.fxml"));
+			AnchorPane page = (AnchorPane)loader.load();
+
+			Stage editStage = new Stage();
+			editStage.setTitle("新增产品");
+			editStage.initModality(Modality.WINDOW_MODAL);
+			editStage.initOwner(mainStage);
+			editStage.getIcons().add(new Image("file:resources/images/person.png"));
+			Scene scene = new Scene(page);
+			editStage.setScene(scene);
+
+			EditProductTypeController editProductController = loader.getController();
+			editProductController.setMainApp(this);
+			editProductController.setEditProductTypeController(newProductController);
+			editProductController.setEditStage(editStage);
+
+			editStage.showAndWait();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**显示产品类型设置主界面
+	 * @param anchorPaneContent
+	 */
+	public void showEditProducType(AnchorPane anchorPaneContent) {
+		try
+		{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/product/EditProductType.fxml"));
+			AnchorPane page = (AnchorPane)loader.load();
+
+			mainStage.setMaximized(true);
+			//先移除面板中的内容
+			anchorPaneContent.getChildren().removeAll(anchorPaneContent.getChildren());
+			//增加新建客户面板
+			anchorPaneContent.getChildren().add(page);
+
+			EditProductTypeController productController = loader.getController();
+			productController.setMainApp(this);
+			productController.setEditProductTypeController(productController);
+			productController.setData();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * 显示身份验证框
+	 */
+	public void showRestoreDB()
+	{
+		try
+		{
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(MainApp.class.getResource("view/system/ConfirmPassword.fxml"));
+			AnchorPane page = (AnchorPane)loader.load();
+
+			Stage stage = new Stage();
+			stage.setTitle("恢复数据库");
+			stage.initModality(Modality.WINDOW_MODAL);
+			stage.initOwner(mainStage);
+			stage.getIcons().add(new Image("file:resources/images/person.png"));
+			Scene scene = new Scene(page);
+			stage.setScene(scene);
+
+			ConfirmPasswordController confirmPasswordController = loader.getController();
+			confirmPasswordController.setMainApp(this);
+			confirmPasswordController.setStage(stage);
+
+			stage.showAndWait();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
 }

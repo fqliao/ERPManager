@@ -51,12 +51,13 @@
                                  </children></AnchorPane>
                         </content>
                       </TitledPane>
-                        <TitledPane fx:id="rankTitledPane" animated="false" prefWidth="176.0" text="级别管理">
+                        <TitledPane fx:id="rankTitledPane" animated="false" prefWidth="176.0" text="产品级别管理">
                            <content>
                               <AnchorPane minHeight="0.0" minWidth="0.0">
                                  <children>
                                     <Button fx:id="newRankButton" layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handleNewRank" prefHeight="23.0" prefWidth="176.0" text="新建级别" />
                                     <Button fx:id="queryRankButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleQueryRank" prefHeight="23.0" prefWidth="176.0" text="查询修改级别" />
+                                    <Button fx:id="editProductTypeButton" layoutX="-7.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleEditProductType" prefHeight="23.0" prefWidth="176.0" text="编辑产品类型" />
                                  </children>
                               </AnchorPane>
                            </content>
@@ -83,6 +84,7 @@
                                     <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlePasswordChange" prefHeight="23.0" prefWidth="176.0" text="密码修改" />
                                     <Button fx:id="newManagerUserButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleNewManagerUser" prefHeight="23.0" prefWidth="176.0" text="注册用户" />
                                     <Button fx:id="queryAndEditManagerUserButton" layoutX="-7.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefHeight="23.0" prefWidth="176.0" text="查询修改用户" />
+                                    <Button fx:id="restoreButton" layoutX="-7.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleRestoreDB" prefHeight="23.0" prefWidth="176.0" text="恢复数据库" />
                                  </children>
                               </AnchorPane>
                           </content>

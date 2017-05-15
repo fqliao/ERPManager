@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xidian.model.order.OrderIdXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
+
+ 	<select id="getCounterByData" parameterType="String" resultType="OrderId">
+		select counter from orderid where data = #{data};
+	</select>
+
+	<insert id="addOrderId" parameterType="String">
+		insert into orderid (data, counter )
+		values               (#{data}, 0);
+	</insert>
+
+    <update id="updateOrderIdCounter" parameterType="OrderId">
+		update orderid set counter = #{counter}
+						where data = #{data};
+	</update>
+
+</mapper>

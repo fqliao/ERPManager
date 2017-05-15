@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="178.0" prefWidth="420.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.product.EditProductTypeController">
+   <children>
+      <Button layoutX="173.0" layoutY="120.0" mnemonicParsing="false" onAction="#addProductType" prefHeight="25.0" prefWidth="75.0" text="保存" />
+      <Label layoutX="79.0" layoutY="65.0" text="新产品类型" />
+      <TextField fx:id="newProductTypeField" layoutX="148.0" layoutY="61.0" prefHeight="25.0" prefWidth="188.0" />
+   </children>
+</AnchorPane>

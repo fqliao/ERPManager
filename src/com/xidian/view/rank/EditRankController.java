@@ -40,6 +40,15 @@ public class EditRankController {
 	private TextField productSumField;
 
 	@FXML
+	private TextField producttypeField;
+
+	@FXML
+	private TextField createtimeField;
+
+	@FXML
+	private TextField updatetimeField;
+
+	@FXML
 	private AnchorPane editAnchorPane;
 
 	@FXML
@@ -79,6 +88,9 @@ public class EditRankController {
 		//设置客户数据到修改表单
 		this.rank = rank;
 		rankField.setText(rank.getRank());
+		producttypeField.setText(rank.getProducttype());
+		createtimeField.setText(LocalDateTimeUtil.format(rank.getCreatetime()));
+		updatetimeField.setText(LocalDateTimeUtil.format(rank.getUpdatetime()));
 		productNumField.setText(rank.getProductNum()+"");
 		productPriceField.setText(rank.getProductPrice()+"");
 		productSumField.setText(rank.getProductSum()+"");
@@ -168,6 +180,7 @@ public class EditRankController {
 		String rankString = rankField.getText().trim();
 		String productNumString = productNumField.getText().trim();
 		String productPriceString =productPriceField.getText().trim();
+		String productTypeString = producttypeField.getText().trim();
 
 		int productNum = 0;
 		int productPrice = 0;
@@ -221,6 +234,7 @@ public class EditRankController {
 			rank.setProductSum(productSum);
 			LocalDateTime now = LocalDateTimeUtil.getNow();
 			rank.setUpdatetime(now);
+			rank.setProducttype(productTypeString);
 
 			int updateRankResult = 0;
 			String message = "";
@@ -263,6 +277,8 @@ public class EditRankController {
 	private void handleDeleteRank()
 	{
 
+
+
 		if(!MessageUtil.alertConfirm("提示", "确认删除吗"))
 		{
 			return;
@@ -274,7 +290,7 @@ public class EditRankController {
 		int deleteResult = 0;
 		try
 		{
-			deleteResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRank", rank.getRank());
+			deleteResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRank", rank);
 		}
 		catch(Exception e)
 		{
