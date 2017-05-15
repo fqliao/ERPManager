@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
-import com.xidian.model.balance.UpdateBalance;
 import com.xidian.model.customer.Customer;
 import com.xidian.model.updateinfo.UpdateInfo;
 import com.xidian.util.DataValicateUtil;
@@ -17,6 +16,7 @@ import com.xidian.util.MybatisUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 
@@ -69,6 +69,9 @@ public class NewCustomerController {
 	private TextField createTimeField;
 
 	@FXML
+	private TextArea remarkField;
+
+	@FXML
 	private AnchorPane editAnchorPane;
 
 	private MainApp mainApp;
@@ -85,22 +88,12 @@ public class NewCustomerController {
 	@FXML
 	private void initialize()
 	{
-		SqlSession sqlSession = null;
+		SqlSession  sqlSession = MybatisUtils.getSqlSession(true);
+
 		List<String> ranks = null;
-		try
-		{
-			sqlSession = MybatisUtils.getSqlSession(true);
-			ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-		}
-		catch (Exception e)
-		{
-			MessageUtil.alertInfo("数据库异常，重启系统");
-			e.printStackTrace();
-		}
-		finally
-		{
-			sqlSession.close();
-		}
+		ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+		sqlSession.close();
+
 		rankBox.getItems().removeAll(rankBox.getItems());
 
 		rankBox.getItems().addAll(ranks);
@@ -120,27 +113,30 @@ public class NewCustomerController {
 	private void handleSaveCustomer()
 	{
 		String auid = auidField.getText();
-		String code = codeField.getText();
 		if(auid == null || "".equals(auid.trim()))
 		{
 			isAuidLabel.setText("请输入授权号！");
 			return;
 		}
-		if(code == null || "".equals(code.trim()))
-		{
-			codeLabel.setText("请输入串码！");
-			return;
-		}
 		SqlSession sqlSession = MybatisUtils.getSqlSession(false);
 		customer = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", auid);
-		if (customer != null) {
-			isAuidLabel.setText("授权号已存在!");
+		if(customer != null)
+		{
+			isAuidLabel.setText("授权号已存在！");
 			return;
 		}
 		else
 		{
 			isAuidLabel.setText("");
 		}
+
+		String code = codeField.getText();
+		if(code == null || "".equals(code.trim()))
+		{
+			codeLabel.setText("请输入串码！");
+			return;
+		}
+
 		customer = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByCode", code);
 		if (customer != null) {
 			codeLabel.setText("串码已存在!");
@@ -150,25 +146,22 @@ public class NewCustomerController {
 		{
 			codeLabel.setText("");
 		}
-		//首先验证输入数据
-		if(!"".equals(isAuidLabel.getText()))
-		{
-			MessageUtil.alertInfo("请输入正确的授权号！");
-			return;
-		}
+
 		customer = new Customer();
 
 		//正式
-		customer.setAuid(auid);
-		customer.setCode(codeField.getText());
-		customer.setRank(rankBox.getSelectionModel().getSelectedItem());
-		customer.setCustomerName(customernameField.getText());
-		customer.setSex(sexBox.getSelectionModel().getSelectedItem());
-		customer.setIdcard(idcardField.getText());
-		customer.setAddress(addressField.getText());
-		customer.setPhone(phoneField.getText());
-		customer.setQq(qqField.getText());
-		customer.setWeixin(weixinField.getText());
+
+		customer.setAuid(auid.trim());
+		customer.setCode(codeField.getText().trim());
+		customer.setRank(rankBox.getSelectionModel().getSelectedItem().trim());
+		customer.setCustomerName(customernameField.getText().trim());
+		customer.setSex(sexBox.getSelectionModel().getSelectedItem().trim());
+		customer.setIdcard(idcardField.getText().trim());
+		customer.setAddress(addressField.getText().trim());
+		customer.setPhone(phoneField.getText().trim());
+		customer.setQq(qqField.getText().trim());
+		customer.setWeixin(weixinField.getText().trim());
+		customer.setRemark(remarkField.getText().trim());
 
 		//测试
 //		customer.setIdcard("421281199002061256");
@@ -186,9 +179,21 @@ public class NewCustomerController {
 			int addCustomerResult = 0;
 			int addBalanceResult = 0;
 			int addUpdateInfoResult = 0;
-			int addUpdateBalance = 0;
+//			int addUpdateBalance = 0;
 			try {
 
+				//检测身份证是否被撤销资格
+				String state = sqlSession.selectOne("com.xidian.CustomerXml.getIdcardOfState",customer.getIdcard());
+				if("撤销".equals(state))
+				{
+					MessageUtil.alertInfo("省份证号"+customer.getIdcard()+"已被撤销授权资格！");
+					return;
+				}
+				if("注册".equals(state))
+				{
+					MessageUtil.alertInfo("省份证号"+customer.getIdcard()+"已被注册！");
+					return;
+				}
 				addCustomerResult = sqlSession.insert("com.xidian.CustomerXml.addCustomer", customer);
 
 				addBalanceResult = sqlSession.insert("com.xidian.BalanceXml.addBalance", customer.getAuid());
@@ -203,16 +208,16 @@ public class NewCustomerController {
 
 				addUpdateInfoResult = sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
 
-				UpdateBalance updateBalance = new UpdateBalance();
-				updateBalance.setAuid(customer.getAuid());
-				updateBalance.setRank(customer.getRank());
-				updateBalance.setPreBalance(0);
-				updateBalance.setUpdateBalance(0);
-				updateBalance.setPosBalance(0);
-				updateBalance.setUpdateTime(now);
-				updateBalance.setUpdateReason("注册");
-
-				addUpdateBalance = sqlSession.insert("com.xidian.UpdateBalanceXml.addUpdateBalance", updateBalance);
+//				UpdateBalance updateBalance = new UpdateBalance();
+//				updateBalance.setAuid(customer.getAuid());
+//				updateBalance.setRank(customer.getRank());
+//				updateBalance.setPreBalance(0);
+//				updateBalance.setUpdateBalance(0);
+//				updateBalance.setPosBalance(0);
+//				updateBalance.setUpdateTime(now);
+//				updateBalance.setUpdateReason("注册");
+//
+//				addUpdateBalance = sqlSession.insert("com.xidian.UpdateBalanceXml.addUpdateBalance", updateBalance);
 
 				sqlSession.commit();//提交事务
 
@@ -227,7 +232,7 @@ public class NewCustomerController {
 				sqlSession.close();
 			}
 
-			if (addCustomerResult == 1 && addBalanceResult == 1 && addUpdateInfoResult == 1 && addUpdateBalance == 1)// 保存成功后清空表单数据
+			if (addCustomerResult == 1 && addBalanceResult == 1 && addUpdateInfoResult == 1)// 保存成功后清空表单数据
 			{
 				message = "保存成功！";
 
@@ -242,6 +247,7 @@ public class NewCustomerController {
 				qqField.setText("");
 				weixinField.setText("");
 				isAuidLabel.setText("");
+				remarkField.setText("");
 			}
 			else
 			{

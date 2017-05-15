@@ -28,13 +28,22 @@ import javafx.util.Callback;
 public class QueryCustomerController {
 
 	@FXML
-	private TextField auidField;
+	private TextField auidField; //授权号
 
 	@FXML
-	private TextField customernameField;
+	private TextField codeField; //串号
 
 	@FXML
-	private ComboBox<String> rankBox;
+	private TextField customernameField; //姓名
+
+	@FXML
+	private TextField idcardField; //省份证号
+
+	@FXML
+	private ComboBox<String> rankBox; //级别
+
+	@FXML
+	private ComboBox<String> stateBox; //状态
 
 	@FXML
 	private TableView<Customer> customerTable;
@@ -81,6 +90,9 @@ public class QueryCustomerController {
 	@FXML
 	private TableColumn<Customer, String> stateColumn;
 
+	@FXML
+	private TableColumn<Customer, String> remarkColumn;
+
 //	@FXML
 //	private TableColumn<Customer, String> isUpgradeColumn;
 
@@ -118,11 +130,16 @@ public class QueryCustomerController {
 		{
 			sqlSession.close();
 		}
-		rankBox.getItems().removeAll(rankBox.getItems());
 
+		rankBox.getItems().removeAll(rankBox.getItems());
 		rankBox.getItems().add("请选择");
 		rankBox.getItems().addAll(ranks);
 		rankBox.getSelectionModel().select("请选择");
+
+		stateBox.getItems().removeAll(stateBox.getItems());
+		stateBox.getItems().add("请选择");
+		stateBox.getItems().addAll("注册","过期","撤销");
+		stateBox.getSelectionModel().select("注册");
 	}
 
 	/**定义列的点击事件类
@@ -173,49 +190,103 @@ public class QueryCustomerController {
 		customerTable.getItems().clear();
 
 		customer = new Customer();
-		String auid = auidField.getText();
-		String customerName = customernameField.getText();
-		String rank = rankBox.getSelectionModel().getSelectedItem();
+		String auid = auidField.getText().trim();
+		String code = codeField.getText().trim();
+		String customerName = customernameField.getText().trim();
+		String idcard = idcardField.getText().trim();
+		String rank = rankBox.getSelectionModel().getSelectedItem().trim();
+		String state = stateBox.getSelectionModel().getSelectedItem().trim();
+
+		if(!"".equals(auid))
+		{
+			customer.setAuid("%"+auid+"%");
+		}
+		else
+		{
+			customer.setAuid(auid);
+		}
+		if(!"".equals(code))
+		{
+			customer.setCode("%"+code+"%");
+		}
+		else
+		{
+			customer.setCode(code);
+		}
+		if(!"".equals(customerName))
+		{
+			customer.setCustomerName("%"+customerName+"%");
+		}
+		else
+		{
+			customer.setCustomerName(customerName);
+		}
+		if(!"".equals(idcard))
+		{
+			customer.setIdcard("%"+idcard+"%");
+		}
+		else
+		{
+			customer.setIdcard(idcard);
+		}
+		if(!"请选择".equals(rank))
+		{
+			customer.setRank(rank);
+		}
+		else
+		{
+			customer.setRank("");
+		}
+		if(!"请选择".equals(state))
+		{
+			customer.setState(state);
+		}
+		else
+		{
+			customer.setState("");
+		}
 
 		SqlSession sqlSession = mainApp.getSqlSession(true);
 
-		// 通过授权号查询客户信息
-		if (!"".equals(auid.trim())) {
-			Customer customerByAuid = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", "%"+auid+"%");
-			if(customerByAuid == null)
-			{
-				return;
-			}
-			customerData.add(customerByAuid);
-		} else {
-			// 如果没有查询信息，则全部查询
-			if (("".equals(customerName.trim())) && ("请选择".equals(rank))) {
-				List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getAllCustomer");
-				customerData.addAll(customers);
-			}
-			// 通过代理级别查询客户信息
-			if (("".equals(customerName.trim())) && (!"请选择".equals(rank))) {
-				List<Customer> customersByRank = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByRank",
-						rank);
-				customerData.addAll(customersByRank);
-			}
-
-			// 通过客户姓名查询客户信息
-			if ((!"".equals(customerName.trim())) && ("请选择".equals(rank))) {
-				List<Customer> customersByName = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByName",
-						"%"+customerName+"%");
-				customerData.addAll(customersByName);
-			}
-
-			// 通过代理级别和客户姓名查询客户信息
-			if ((!"".equals(customerName.trim())) && (!"请选择".equals(rank))) {
-				customer.setRank(rank);
-				customer.setCustomerName("%"+customerName+"%");
-				List<Customer> customersByRankAndName = sqlSession
-						.selectList("com.xidian.CustomerXml.getCustomerByRankAndName", customer);
-				customerData.addAll(customersByRankAndName);
-			}
-		}
+		List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getCustomers", customer);
+		customerData.addAll(customers);
+//		// 通过授权号查询客户信息
+//		if (!"".equals(auid.trim())) {
+//			Customer customerByAuid = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", "%"+auid+"%");
+//			if(customerByAuid == null)
+//			{
+//				return;
+//			}
+//			customerData.add(customerByAuid);
+//		} else {
+//			// 如果没有查询信息，则全部查询
+//			if (("".equals(customerName.trim())) && ("请选择".equals(rank))) {
+//				List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getAllCustomer");
+//				customerData.addAll(customers);
+//			}
+//			// 通过代理级别查询客户信息
+//			if (("".equals(customerName.trim())) && (!"请选择".equals(rank))) {
+//				List<Customer> customersByRank = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByRank",
+//						rank);
+//				customerData.addAll(customersByRank);
+//			}
+//
+//			// 通过客户姓名查询客户信息
+//			if ((!"".equals(customerName.trim())) && ("请选择".equals(rank))) {
+//				List<Customer> customersByName = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByName",
+//						"%"+customerName+"%");
+//				customerData.addAll(customersByName);
+//			}
+//
+//			// 通过代理级别和客户姓名查询客户信息
+//			if ((!"".equals(customerName.trim())) && (!"请选择".equals(rank))) {
+//				customer.setRank(rank);
+//				customer.setCustomerName("%"+customerName+"%");
+//				List<Customer> customersByRankAndName = sqlSession
+//						.selectList("com.xidian.CustomerXml.getCustomerByRankAndName", customer);
+//				customerData.addAll(customersByRankAndName);
+//			}
+//		}
 
 		//表中放数据
 		customerTable.setItems(customerData);
@@ -237,6 +308,7 @@ public class QueryCustomerController {
 		weixinColumn.setStyle( "-fx-alignment: CENTER;");
 		balanceColumn.setStyle("-fx-alignment: CENTER;");
 		stateColumn.setStyle( "-fx-alignment: CENTER;");
+		remarkColumn.setStyle( "-fx-alignment: CENTER;");
 //		isUpgradeColumn.setStyle( "-fx-alignment: CENTER;");
 
 		// 将数据放入表中的列
@@ -253,6 +325,7 @@ public class QueryCustomerController {
 		weixinColumn.setCellValueFactory(cellData -> cellData.getValue().weixinProperty());
 		balanceColumn.setCellValueFactory(cellData -> cellData.getValue().balanceProperty().asObject());
 		stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
+		remarkColumn.setCellValueFactory(cellData -> cellData.getValue().remarkProperty());
 //		isUpgradeColumn.setCellValueFactory(cellData -> cellData.getValue().isUpgradeProperty());
 
 		//设置每一列的双击事件
@@ -271,6 +344,7 @@ public class QueryCustomerController {
 		weixinColumn.setCellFactory(stringCellFactory);
 		balanceColumn.setCellFactory(intCellFactory);
 		stateColumn.setCellFactory(stringCellFactory);
+		remarkColumn.setCellFactory(stringCellFactory);
 //		isUpgradeColumn.setCellFactory(stringCellFactory);
 
 	}

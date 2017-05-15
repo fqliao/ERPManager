@@ -2,11 +2,11 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xidian.CustomerXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
 
-	<select id="getCustomerByAuid" parameterType="String" resultType="Customer">
+	<select id="getCustomerByAuid" parameterType="String" resultType="com.xidian.model.customer.Customer">
 		select customer.*, balance from customer inner join balance on customer.auid = balance.auid and customer.auid like #{auid};
 
 	</select>
-	<select id="getCustomerByCode" parameterType="String" resultType="Customer">
+	<select id="getCustomerByCode" parameterType="String" resultType="com.xidian.model.customer.Customer">
 		select * from customer where code = #{code};
 	</select>
 
@@ -14,47 +14,72 @@
 		select c.customername from customer as c where auid = #{auid};
 	</select>
 
-	<select id="getCustomerByAuidToOrder" parameterType="String" resultType="Customer">
-		select customer.rank, customer.code, productnum, productprice from customer, rank where auid = #{auid} and state = '注册' and customer.rank = rank.rank;
+	<select id="getCustomerByAuidToOrder" parameterType="String" resultType="com.xidian.model.customer.Customer">
+		select customer.rank, customer.code  from customer where auid = #{auid} and state = '注册';
 	</select>
 
-	<select id="getCustomerByName" parameterType="String" resultType="Customer">
+	<select id="getCustomerByName" parameterType="String" resultType="com.xidian.model.customer.Customer">
 
 		select customer.*, balance.balance from customer inner join balance on customer.auid = balance.auid and customer.customername like #{customerName};
 	</select>
 
-	<select id="getCustomerByRank" parameterType="String" resultType="Customer">
+	<select id="getCustomerByRank" parameterType="String" resultType="com.xidian.model.customer.Customer">
 		select customer.*, balance from customer inner join balance on customer.auid = balance.auid and customer.rank = #{rank};
 	</select>
 
-	<select id="getCustomerByRankAndName" parameterType="Customer" resultType="Customer">
+	<select id="getCustomerByRankAndName" parameterType="Customer" resultType="com.xidian.model.customer.Customer">
 		select customer.*, balance.balance from customer inner join balance on customer.auid = balance.auid and customer.rank = #{rank} and customer.customername like #{customerName};
 	</select>
 
-	<select id="getAllCustomer" resultType="Customer">
+	<select id="getAllCustomer" resultType="com.xidian.model.customer.Customer">
 		select customer.*, balance from customer inner join balance on customer.auid = balance.auid;
 	</select>
 
-	<insert id="addCustomer" parameterType="Customer">
-		insert into customer (auid,    code,   rank,    customername,    sex,    age,    idcard,      address,    phone,    qq,    weixin,  createtime)
-		values               (#{auid}, #{code}, #{rank}, #{customerName}, #{sex}, #{age}, #{idcard}, #{address}, #{phone}, #{qq}, #{weixin}, #{createTime});
+	<insert id="addCustomer" parameterType="com.xidian.model.customer.Customer">
+		insert into customer (auid,    code,   rank,    customername,    sex,    age,    idcard,      address,    phone,    qq,    weixin,  createtime, remark)
+		values               (#{auid}, #{code}, #{rank}, #{customerName}, #{sex}, #{age}, #{idcard}, #{address}, #{phone}, #{qq}, #{weixin}, #{createTime},#{remark});
 	</insert>
 
-	<update id="updateCustomer" parameterType="Customer">
+	<update id="updateCustomer" parameterType="com.xidian.model.customer.Customer">
 		update customer set rank = #{rank}, customername = #{customerName}, sex = #{sex}, age = #{age}, idcard = #{idcard},
-						address = #{address}, phone = #{phone}, qq = #{qq}, weixin = #{weixin}, state = #{state}
+						address = #{address}, phone = #{phone}, qq = #{qq}, weixin = #{weixin}, state = #{state}, remark = #{remark}
 						where id = #{id};
 	</update>
 
-	<update id="updateCustomerIsUpgrade" parameterType="Customer">
+	<update id="updateCustomerIsUpgrade" parameterType="com.xidian.model.customer.Customer">
 		update customer set isupgrade = #{isUpgrade}, createtime = #{createTime}
 		where auid = #{auid};
 	</update>
 
-	<update id="updateCustomerOfState" parameterType="Customer">
+	<update id="updateCustomerOfState" parameterType="com.xidian.model.customer.Customer">
 		update customer set rank = #{rank}, state = #{state}, createtime = #{createTime}
 		where auid = #{auid};
 	</update>
 
+	<select id="getIdcardOfState" parameterType="String" resultType="String">
+		select state from customer where idcard = #{idcard} order by createtime desc limit 1;
+	</select>
+
+	<select id="getCustomers" parameterType="com.xidian.model.customer.Customer" resultType="com.xidian.model.customer.Customer">
+	    select customer.*, balance from customer inner join balance on customer.auid = balance.auid
+		<if test="auid != ''">
+			and customer.auid like #{auid}
+		</if>
+		<if test="code != ''">
+			and customer.code like #{code}
+		</if>
+		<if test="customerName != ''">
+			and customer.customername like #{customerName}
+		</if>
+		<if test="idcard != ''">
+			and customer.idcard like #{idcard}
+		</if>
+		<if test="rank != ''">
+			and customer.rank like #{rank}
+		</if>
+		<if test="state != ''">
+			and customer.state like #{state}
+		</if>
+	</select>
 
 </mapper>

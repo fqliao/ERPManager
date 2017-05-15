@@ -33,6 +33,7 @@ public class Customer {
 	private final IntegerProperty balance;
 	private final StringProperty isUpgrade;
 	private final ObjectProperty<LocalDateTime> createTime;
+	private final StringProperty remark;
 
 	public Customer() {
 		this.id = new SimpleIntegerProperty();
@@ -53,6 +54,7 @@ public class Customer {
 		this.createTime = new SimpleObjectProperty<LocalDateTime>();
 		this.productNum = new SimpleIntegerProperty();
 		this.productPrice = new SimpleIntegerProperty();
+		this.remark = new SimpleStringProperty();
 	}
 	public int getId() {
 		return id.get();
@@ -77,6 +79,12 @@ public class Customer {
 	}
 	public StringProperty rankProperty(){
 		return rank;
+	}
+	public String getRemark() {
+		return remark.get();
+	}
+	public StringProperty remarkProperty(){
+		return remark;
 	}
 	public String getCustomerName() {
 		return customerName.get();
@@ -219,7 +227,9 @@ public class Customer {
 	public void setProductPrice(int productPrice) {
 		this.productPrice.set(productPrice);
 	}
-
+	public void setRemark(String remark) {
+		this.remark.set(remark);
+	}
 
 
 }

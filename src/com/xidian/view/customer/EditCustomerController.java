@@ -13,9 +13,12 @@ import com.xidian.util.MessageUtil;
 import com.xidian.util.MybatisUtils;
 import com.xidian.util.SingletonData;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -38,6 +41,9 @@ public class EditCustomerController {
 
 	@FXML
 	private ComboBox<String> rankBox;
+
+	@FXML
+	private CheckBox expiredBox;
 
 	@FXML
 	private CheckBox isRevoke;
@@ -65,6 +71,9 @@ public class EditCustomerController {
 	private TextField createTimeField;
 
 	@FXML
+	private TextArea remarkField;
+
+	@FXML
 	private AnchorPane editAnchorPane;
 
 	@FXML
@@ -89,16 +98,13 @@ public class EditCustomerController {
 	{
 		//设置客户数据到修改表单
 		this.customer = customer;
-
-		if("撤销".equals(customer.getState()))
-		{
-			editButton.setDisable(true);
-		}
-
-		if("普通用户".equals(SingletonData.getSingletonData().getManagerUser().getTypeuser()))
+		rankBox.getItems().removeAll(rankBox.getItems());
+		sexBox.getItems().removeAll(sexBox.getItems());
+		if("过期".equals(customer.getState()) || "撤销".equals(customer.getState()) || "普通用户".equals(SingletonData.getSingletonData().getManagerUser().getTypeuser()))
 		{
 			editButton.setVisible(false);
 			isRevoke.setVisible(false);
+			expiredBox.setVisible(false);
 
 			customernameField.setEditable(false);
 
@@ -111,48 +117,71 @@ public class EditCustomerController {
 			qqField.setEditable(false);
 
 			weixinField.setEditable(false);
+
+			remarkField.setEditable(false);
+
+			rankBox.getItems().add(customer.getRank());
+			sexBox.getItems().add(customer.getSex());
+		}
+		else
+		{
+			SqlSession sqlSession = MybatisUtils.getSqlSession(true);
+			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+			sqlSession.close();
+
+			rankBox.getItems().addAll(ranks);
+			sexBox.getItems().addAll("男", "女");
 		}
 
 		auidField.setText(customer.getAuid());
 		codeField.setText(customer.getCode());
-
-		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-		if("普通用户".equals(SingletonData.getSingletonData().getManagerUser().getTypeuser()))
-		{
-			rankBox.getItems().add(customer.getRank());
-			sexBox.getItems().add(customer.getSex());
-
-		}
-		else
-		{
-			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-			sqlSession.close();
-			rankBox.getItems().addAll(ranks);
-
-			sexBox.getItems().addAll("男", "女");
-		}
 		rankBox.getSelectionModel().select(customer.getRank());
-
-		sexBox.getSelectionModel().select(customer.getSex());
-
 		customernameField.setText(customer.getCustomerName());
-
+		sexBox.getSelectionModel().select(customer.getSex());
 		idcardField.setText(customer.getIdcard());
-
 		addressField.setText(customer.getAddress());
-
 		phoneField.setText(customer.getPhone());
-
 		qqField.setText(customer.getQq());
-
 		weixinField.setText(customer.getWeixin());
+		remarkField.setText(customer.getRemark());
 
 
 	}
 
 	@FXML
 	private void initialize() {
+		expiredBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
 
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
+			{
+				if(newValue)
+				{
+					isRevoke.setDisable(true);
+				}
+				else
+				{
+					isRevoke.setDisable(false);
+				}
+
+			}
+		});
+		isRevoke.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue)
+			{
+				if(newValue)
+				{
+					expiredBox.setDisable(true);
+				}
+				else
+				{
+					expiredBox.setDisable(false);
+				}
+
+			}
+		});
 	}
 
 	/**
@@ -176,9 +205,20 @@ public class EditCustomerController {
 				customer.setRank(selectedRank);
 			}
 		}
+		if(expiredBox.isSelected())
+		{
+			if(!MessageUtil.alertConfirm("提示", "确认授权过期吗？"))
+			{
+				return;
+			}
+			else
+			{
+				customer.setState("过期");
+			}
+		}
 		if(isRevoke.isSelected())
 		{
-			if(!MessageUtil.alertConfirm("提示", "确认撤销吗？"))
+			if(!MessageUtil.alertConfirm("提示", "确认资格撤销吗？"))
 			{
 				return;
 			}
@@ -195,6 +235,7 @@ public class EditCustomerController {
 		customer.setPhone(phoneField.getText());
 		customer.setQq(qqField.getText());
 		customer.setWeixin(weixinField.getText());
+		customer.setRemark(remarkField.getText());
 
 		if (DataValicateUtil.isInputValid(customer)) {
 
@@ -211,8 +252,22 @@ public class EditCustomerController {
 					UpdateInfo updateInfo = new UpdateInfo();
 					updateInfo.setAuid(customer.getAuid());
 					updateInfo.setState("撤销");
-					updateInfo.setRank(customer.getRank());
+					updateInfo.setRank(oldRank);
 					updateInfo.setUpdateReason("撤销");
+					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
+					updateInfo.setUpdateTime(now);
+
+					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+				}
+
+				if(expiredBox.isSelected())
+				{
+					//更新信息变更表
+					UpdateInfo updateInfo = new UpdateInfo();
+					updateInfo.setAuid(customer.getAuid());
+					updateInfo.setState("过期");
+					updateInfo.setRank(oldRank);
+					updateInfo.setUpdateReason("过期");
 					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
 					updateInfo.setUpdateTime(now);
 
@@ -223,13 +278,14 @@ public class EditCustomerController {
 					UpdateInfo updateInfo = new UpdateInfo();
 					updateInfo.setAuid(customer.getAuid());
 					updateInfo.setState("注册");
-					updateInfo.setRank(customer.getRank());
+					updateInfo.setRank(oldRank);
 					updateInfo.setUpdateReason("手动变更级别：由"+oldRank+"变为"+selectedRank);
 					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
 					updateInfo.setUpdateTime(now);
 
 					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
 				}
+
 				sqlSession.commit();
 			}
 			catch(Exception e)
