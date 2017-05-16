@@ -8,7 +8,7 @@
 
 <AnchorPane prefHeight="800.0" prefWidth="1175.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.xidian.view.system.QueryManagerUserController">
    <children>
-      <TableView fx:id="managerUserTable" layoutX="19.0" layoutY="42.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+      <TableView fx:id="managerUserTable" layoutX="19.0" layoutY="122.0" prefHeight="678.0" prefWidth="1175.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="122.0">
         <columns>
           <TableColumn fx:id="usernameColumn" prefWidth="75.0" text="用户名" />
             <TableColumn fx:id="reallynameColumn" prefWidth="75.0" text="姓名" />
@@ -18,10 +18,10 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Label layoutX="426.0" layoutY="14.0" text="用户名" />
-      <TextField fx:id="usernameField" layoutX="472.0" layoutY="10.0" prefHeight="25.0" />
-      <Label layoutX="697.0" layoutY="15.0" text="姓名" />
-      <TextField fx:id="reallynameField" layoutX="730.0" layoutY="10.0" prefHeight="25.0" />
-      <Button layoutX="610.0" layoutY="56.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefWidth="100.0" text="查询" />
+      <Label layoutX="515.0" layoutY="18.0" text="用户名" />
+      <Label layoutX="528.0" layoutY="51.0" text="姓名" />
+      <Button layoutX="588.0" layoutY="81.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefWidth="100.0" text="查询" />
+      <ComboBox fx:id="usernameBox" editable="true" layoutX="561.0" layoutY="14.0" prefWidth="150.0" />
+      <ComboBox fx:id="reallynameBox" editable="true" layoutX="561.0" layoutY="47.0" prefWidth="150.0" />
    </children>
 </AnchorPane>

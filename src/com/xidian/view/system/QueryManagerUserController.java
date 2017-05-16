@@ -6,14 +6,15 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
 import com.xidian.model.system.ManagerUser;
+import com.xidian.util.MybatisUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -26,10 +27,10 @@ import javafx.util.Callback;
 public class QueryManagerUserController {
 
 	@FXML
-	private TextField usernameField;
+	private ComboBox<String> usernameBox;
 
 	@FXML
-	private TextField reallynameField;
+	private ComboBox<String> reallynameBox;
 
 	@FXML
 	private TableView<ManagerUser> managerUserTable;
@@ -71,7 +72,24 @@ public class QueryManagerUserController {
 
 	@FXML
 	private void initialize() {
-
+		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
+		if(usernameBox != null)
+		{
+			List<String> usernames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofUsernameName");
+			usernameBox.getItems().removeAll(usernameBox.getItems());
+//			usernameBox.getItems().add("请选择");
+			usernameBox.getItems().addAll(usernames);
+//			usernameBox.getSelectionModel().select("请选择");
+		}
+		if(reallynameBox != null)
+		{
+			List<String> reallynames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
+			reallynameBox.getItems().removeAll(reallynameBox.getItems());
+//			reallynameBox.getItems().add("请选择");
+			reallynameBox.getItems().addAll(reallynames);
+//			reallynameBox.getSelectionModel().select("请选择");
+		}
+		sqlSession.close();
 	}
 
 	/**定义列的点击事件类
@@ -105,35 +123,54 @@ public class QueryManagerUserController {
 		// 清空表中的数据
 		managerUserTable.getItems().clear();
 
-		String username = usernameField.getText().trim();
-		String reallyname = reallynameField.getText().trim();
+		String username = usernameBox.getSelectionModel().getSelectedItem();
+		String reallyname = reallynameBox.getSelectionModel().getSelectedItem();
 
 		SqlSession sqlSession = mainApp.getSqlSession(true);
 
 		List<ManagerUser> managerUsers;
-		// 通过用户名查询用户信息
-		if (!"".equals(username) && "".equals(reallyname))
+		ManagerUser user = new ManagerUser();
+		if(username == null)
 		{
-			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameLike", "%"+username+"%");
-			managerUserData.addAll(managerUsers);
-		}
-		// 通过姓名查询用户信息
-		else if("".equals(username) && !"".equals(reallyname))
-		{
-			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByReallynameLike", "%"+reallyname+"%");
-			managerUserData.addAll(managerUsers);
-		}
-		else if(!"".equals(username) && !"".equals(reallyname))
-		{
-			ManagerUser managerUser = new ManagerUser("%"+username+"%", "%"+reallyname+"%", null, null);
-			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameAndReallynameLike", managerUser);
-			managerUserData.addAll(managerUsers);
+			user.setUsername("");
 		}
 		else
 		{
-			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAll");
-			managerUserData.addAll(managerUsers);
+			user.setUsername("%"+username+"%");
 		}
+		if(reallyname == null)
+		{
+			user.setReallyname("");
+		}
+		else
+		{
+			user.setReallyname("%"+reallyname+"%");
+		}
+		managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUsers", user);
+		managerUserData.addAll(managerUsers);
+//		// 通过用户名查询用户信息
+//		if (!"".equals(username) && "".equals(reallyname))
+//		{
+//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameLike", "%"+username+"%");
+//			managerUserData.addAll(managerUsers);
+//		}
+//		// 通过姓名查询用户信息
+//		else if("".equals(username) && !"".equals(reallyname))
+//		{
+//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByReallynameLike", "%"+reallyname+"%");
+//			managerUserData.addAll(managerUsers);
+//		}
+//		else if(!"".equals(username) && !"".equals(reallyname))
+//		{
+//			ManagerUser managerUser = new ManagerUser("%"+username+"%", "%"+reallyname+"%", null, null);
+//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameAndReallynameLike", managerUser);
+//			managerUserData.addAll(managerUsers);
+//		}
+//		else
+//		{
+//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAll");
+//			managerUserData.addAll(managerUsers);
+//		}
 
 		//表中放数据
 		managerUserTable.setItems(managerUserData);

@@ -19,10 +19,10 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
          </columnResizePolicy>
       </TableView>
-      <Label layoutX="426.0" layoutY="14.0" text="授权号" />
-      <TextField fx:id="auidField" layoutX="472.0" layoutY="10.0" prefHeight="25.0" />
-      <Label layoutX="660.0" layoutY="14.0" text="收件人姓名" />
-      <TextField fx:id="receiverNameField" layoutX="730.0" layoutY="10.0" prefHeight="25.0" />
-      <Button layoutX="610.0" layoutY="56.0" mnemonicParsing="false" onAction="#handleQueryAddress" prefWidth="100.0" text="查询" />
+      <Label layoutX="520.0" layoutY="7.0" text="授权号" />
+      <TextField fx:id="auidField" layoutX="566.0" layoutY="3.0" prefHeight="25.0" />
+      <Label layoutX="496.0" layoutY="41.0" text="收件人姓名" />
+      <TextField fx:id="receiverNameField" layoutX="566.0" layoutY="37.0" prefHeight="25.0" />
+      <Button layoutX="587.0" layoutY="69.0" mnemonicParsing="false" onAction="#handleQueryAddress" prefWidth="100.0" text="查询" />
    </children>
 </AnchorPane>

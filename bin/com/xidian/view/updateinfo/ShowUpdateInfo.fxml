@@ -38,7 +38,6 @@
             </Label>
          </children>
       </GridPane>
-      <Button layoutX="166.0" layoutY="279.0" mnemonicParsing="false" onAction="#handleShutWindow" prefHeight="24.0" prefWidth="102.0" text="关闭" />
       <TextField fx:id="createTimeField" layoutX="10.0" layoutY="340.0" minHeight="0.0" minWidth="0.0" prefHeight="0.0" prefWidth="0.0" />
    </children>
 </AnchorPane>

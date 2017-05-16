@@ -2,41 +2,55 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xidian.ManagerUserXml"> <!-- 命名空间是文件的包名，定位该文件在哪个包下 -->
 
-	<select id="getManagerUser" parameterType="String" resultType="ManagerUser">
+	<select id="getManagerUser" parameterType="String" resultType="com.xidian.model.system.ManagerUser">
 		select * from manageruser where username = #{username};
 	</select>
 
-	<select id="getManagerUserByUsernameLike" parameterType="String" resultType="ManagerUser">
+	<select id="getManagerUserByUsernameLike" parameterType="String" resultType="com.xidian.model.system.ManagerUser">
 		select * from manageruser where username like #{username};
 	</select>
 
-	<select id="getManagerUserByReallynameLike" parameterType="String" resultType="ManagerUser">
+	<select id="getManagerUserByReallynameLike" parameterType="String" resultType="com.xidian.model.system.ManagerUser">
 		select * from manageruser where reallyname like #{reallyname};
 	</select>
 
-	<select id="getManagerUserByUsernameAndReallynameLike" parameterType="ManagerUser" resultType="ManagerUser">
+	<select id="getManagerUserByUsernameAndReallynameLike" parameterType="com.xidian.model.system.ManagerUser" resultType="com.xidian.model.system.ManagerUser">
 		select * from manageruser where username like #{username} and reallyname like #{reallyname};
 	</select>
 
-	<select id="getManagerUserAll" resultType="ManagerUser">
+	<select id="getManagerUserAll" resultType="com.xidian.model.system.ManagerUser">
 		select * from manageruser;
+	</select>
+
+	<select id="getManagerUsers" resultType="com.xidian.model.system.ManagerUser">
+		select * from manageruser where 1 = 1
+		<if test="username !=''">
+			and username like #{username}
+		</if>
+		<if test="reallyname !=''">
+			and reallyname like #{reallyname}
+		</if>
 	</select>
 
 	<select id="getManagerUserAllofReallyName" resultType="String">
 		select reallyname from manageruser;
 	</select>
 
-	<insert id="addManagerUser" parameterType="ManagerUser">
+	<select id="getManagerUserAllofUsernameName" resultType="String">
+		select username from manageruser;
+	</select>
+
+	<insert id="addManagerUser" parameterType="com.xidian.model.system.ManagerUser">
 		insert into manageruser (username, reallyname, password, typeuser)
 		values                 (#{username}, #{reallyname}, #{password}, #{typeuser});
 	</insert>
 
-	<update id="updateManagerUser" parameterType="ManagerUser">
+	<update id="updateManagerUser" parameterType="com.xidian.model.system.ManagerUser">
 		update manageruser set password = #{password}
 		where                  username = #{username};
 	</update>
 
-	<update id="updateManagerUserByReset" parameterType="ManagerUser">
+	<update id="updateManagerUserByReset" parameterType="com.xidian.model.system.ManagerUser">
 		update manageruser set password = #{password}
 		where          username = #{username};
 	</update>
