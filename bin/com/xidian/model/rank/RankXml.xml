@@ -47,7 +47,7 @@
 		select * from rank;
 	</select>
 
-	<select id="getAllRankByProductTypr" parameterType="String" resultType="Rank">
+	<select id="getAllRankByProductType" parameterType="String" resultType="Rank">
 		select * from rank where producttype = #{productType};
 	</select>
 

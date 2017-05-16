@@ -1,19 +1,16 @@
 package com.xidian.view.order;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
 import com.xidian.model.order.Order;
+import com.xidian.model.order.OrderId;
 import com.xidian.model.rank.Rank;
 import com.xidian.model.updateinfo.UpdateInfo;
 import com.xidian.model.address.Address;
@@ -133,7 +130,11 @@ public class NewOrderController {
 	private int price;
 	private int total;
 	private int productNum;
-	List<Rank> ranks = new ArrayList<>();
+	private int productNumChange;
+	private String createtime;
+	private int counter;
+//	List<Rank> ranks = new ArrayList<>();
+	List<Rank> ranksAll = new ArrayList<>();
 
 	public NewOrderController() {
 
@@ -187,20 +188,66 @@ public class NewOrderController {
 			});
 		}
 
-		SqlSession sqlSession = null;
-		try
+		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
+
+		//对代理类型进行监听
+		if(rankBox != null)
 		{
-			sqlSession = MybatisUtils.getSqlSession(true);
-			ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getAllRank");
+			rankBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					if(newValue != null){
+						List<String> productType;
+						productType = sqlSession.selectList("com.xidian.model.rank.RankXml.getProductTypeByRank",newValue);
+						productIdBox.getItems().removeAll(productIdBox.getItems());
+						productIdBox.getItems().addAll(productType);
+						productIdBox.getSelectionModel().select(productType.get(0));
+					}
+					else{
+						rankBox.getItems().removeAll(productPriceBox.getItems());
+					}
+
+				}
+			});
 		}
-		catch (Exception e)
+
+		//对产品类型进行监听
+		if(productIdBox != null)
 		{
-			MessageUtil.alertInfo("数据库异常，重启系统");
-			e.printStackTrace();
-		}
-		finally
-		{
-			sqlSession.close();
+			productIdBox.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+				@Override
+				public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+					if(newValue != null){
+						//由代理级别与产品确定代理等级区间
+//						ranksAll.clear();
+						ranksAll = sqlSession.selectList("com.xidian.model.rank.RankXml.getAllRankByProductType",newValue);
+
+						productPriceBox.getItems().removeAll(productPriceBox.getItems());
+						Rank rankInOrder = new Rank();
+						rankInOrder.setRank(rankBox.getSelectionModel().getSelectedItem());
+						rankInOrder.setProducttype(newValue);
+						Rank productSelect = sqlSession.selectOne("com.xidian.model.rank.RankXml.getProductPriceByRankAndProductType",rankInOrder);
+						productPriceBox.getItems().add(String.valueOf(productSelect.getProductPrice()));
+						productPriceBox.getSelectionModel().select(String.valueOf(productSelect.getProductPrice()));
+
+						//确定代理产品数量区间
+						productNumChange = productSelect.getProductNum();
+						productNumField.setPromptText("提货数量至少为"+ productSelect.getProductNum());
+
+						//变更产品后，将输入的产品数量清空
+						productNumField.setText("");
+						totalLabel.setText("");
+						productNumLabel.setText("");
+
+					}
+					else{
+						productPriceBox.getItems().removeAll(productPriceBox.getItems());
+					}
+
+				}
+			});
 		}
 
 		if(productNumField != null)
@@ -331,13 +378,12 @@ public class NewOrderController {
 				rankBox.getItems().add(rank);
 				rankBox.getSelectionModel().select(rank);
 
-				//设置产品价格
-				productPriceBox.getItems().removeAll(productPriceBox.getItems());
-				String productPrice = customer.getProductPrice()+"";
-				productPriceBox.getItems().add(productPrice);
-				productPriceBox.getSelectionModel().select(productPrice);
+//				//设置产品价格
+//				productPriceBox.getItems().removeAll(productPriceBox.getItems());
+//				String productPrice = customer.getProductPrice()+"";
+//				productPriceBox.getItems().add(productPrice);
+//				productPriceBox.getSelectionModel().select(productPrice);
 
-				productNumField.setPromptText("提货数量至少为"+ customer.getProductNum());
 				//查询收货地址
 				addressByAuid = sqlSession.selectList("com.xidian.model.address.AddressXml.getAddressByAuid", auid);
 				addressData.addAll(addressByAuid);
@@ -349,6 +395,33 @@ public class NewOrderController {
 					receiverPhoneField.setText(address.getReceiverPhone());
 					receiverAddressField.setText(address.getReceiverAddress());
 				}
+				//设置订单号
+                createtime = LocalDate.now().toString().replaceAll("-", "");
+                OrderId orderId = sqlSession.selectOne("com.xidian.model.order.OrderIdXml.getCounterByCreateTime",createtime);
+                if(orderId != null){
+                	 counter = orderId.getCounter()+1;
+                	String orderIdCounterString;
+                	if(counter <10){
+                		 orderIdCounterString = "-000"+String.valueOf(counter);
+                	}
+                	else if(counter <100 && counter >9){
+                		 orderIdCounterString = "-00"+String.valueOf(counter);
+                	}
+                	else if(counter <1000 && counter >99){
+                		 orderIdCounterString = "-0"+String.valueOf(counter);
+                	}
+                	else if(counter <10000 && counter >999){
+                		 orderIdCounterString = "-"+String.valueOf(counter);
+                	}
+                	else{
+                		orderIdCounterString = "-"+String.valueOf(counter);
+                	}
+                	orderIdField.setText("YW"+createtime+orderIdCounterString);
+                }
+                else{
+                	sqlSession.insert("com.xidian.model.order.OrderIdXml.addOrderId", createtime);
+                	orderIdField.setText("YW"+createtime+"-0001");
+                }
 
 			}
 			else
@@ -374,14 +447,6 @@ public class NewOrderController {
 	private void caculate(String numString)
 	{
 
-		rankBox.getItems().removeAll(rankBox.getItems());
-		rankBox.getItems().add(customer.getRank());
-		rankBox.getSelectionModel().selectFirst();
-
-		productPriceBox.getItems().removeAll(productPriceBox.getItems());
-		productPriceBox.getItems().add(customer.getProductPrice()+"");
-		productPriceBox.getSelectionModel().selectFirst();
-
 		productNumLabel.setText("");
 		try
 		{
@@ -401,48 +466,24 @@ public class NewOrderController {
 			totalLabel.setText("");
 			return;
 		}
-		else if(productNum < customer.getProductNum())
+		else if(productNum < productNumChange)
 		{
-			productNumLabel.setText("产品数量不能少于"+customer.getProductNum()+"，请重新输入！");
+			productNumLabel.setText("产品数量不能少于"+productNumChange+"，请重新输入！");
 			totalLabel.setText("");
 			return;
 		}
 		else
 		{
 
-			if(productNum != customer.getProductNum())
+			if(productNum != productNumChange)
 			{
-				int num = 0, dnum = 0;
-
-				if("VIP".equals(customer.getRank()) || "特约".equals(customer.getRank()))
-				{
-					num = productNum % customer.getProductNum();
-					if(num != 0)
-					{
-						dnum = customer.getProductNum() - num;
-						productNumLabel.setText("产品数量为"+customer.getProductNum()+"的倍数，需再增加"+dnum+"盒或减少"+num+"盒");
-						totalLabel.setText("");
-						return;
-					}
-				}
-				else
-				{
-					num = (productNum - (productNum / customer.getProductNum()) * customer.getProductNum()) % 24;
-					if(num != 0)
-					{	dnum = 24 - num;
-						productNumLabel.setText("产品数量为本等级数加每件(24盒)的倍数，需再增加"+dnum+"盒或减少"+num+"盒");
-						totalLabel.setText("");
-						return;
-					}
-				}
-
 				//确定数量在哪一个等级
 				Rank newRrank = new Rank();
 				newRrank.setProductNum(productNum);
-				ranks.add(newRrank);
-				Collections.sort(ranks);
-				Rank rank = ranks.get(ranks.indexOf(newRrank)-1);
-				ranks.remove(newRrank);
+				ranksAll.add(newRrank);
+				Collections.sort(ranksAll);
+				Rank rank = ranksAll.get(ranksAll.indexOf(newRrank)-1);
+				ranksAll.remove(newRrank);
 
 				//如果不同等级，则升级
 				if(!rank.getRank().equals(rankBox.getSelectionModel().getSelectedItem()))
@@ -454,13 +495,14 @@ public class NewOrderController {
 						rankBox.getItems().add(rank.getRank());
 						rankBox.getSelectionModel().selectFirst();
 
-						productPriceBox.getItems().removeAll(productPriceBox.getItems());
-						productPriceBox.getItems().add(rank.getProductPrice()+"");
-						productPriceBox.getSelectionModel().selectFirst();
+						String productTypeSelected = productIdBox.getSelectionModel().getSelectedItem();
+						productIdBox.getSelectionModel().select(productTypeSelected);
+						productNumField.setText(String.valueOf(productNum));
+
 					}
 					else
 					{
-						productNumField.setText(customer.getProductNum()+"");
+						productNumField.setText(productNumChange+"");
 						return;
 					}
 				}
@@ -565,7 +607,7 @@ public class NewOrderController {
 			order.setProductSum(totalSum);
 
 			int addOrderResult = 0;
-			int addEvaluateOrderResult = 0;
+			int addOrderidResult = 0;
 			int updateBalanceResult = 0;
 			boolean flag = true;
 			String infoMessage = "";
@@ -597,19 +639,18 @@ public class NewOrderController {
 					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
 				}
 
-				//插入考核订单表
-				EvaluateOrder evaluateOrder = new EvaluateOrder();
-				evaluateOrder.setAuId(order.getAuId());
-				evaluateOrder.setOrderId(order.getOrderId());
-
-				addEvaluateOrderResult = sqlSession.insert("com.xidian.model.evaluate.EvaluateOrderXml.addEvaluateOrder", evaluateOrder);
-
 				//插入货款表
 				Balance balance = new Balance();
 				balance.setAuid(order.getAuId());
 				balance.setBalance(totalSum);
 
 				updateBalanceResult = sqlSession.update("com.xidian.BalanceXml.updateBalance", balance);
+
+				//设置订单号的计数器
+				OrderId orderId = new OrderId();
+				orderId.setCreatetime(createtime);
+				orderId.setCounter(counter);
+				addOrderidResult = sqlSession.update("com.xidian.model.order.OrderIdXml.updateOrderIdCounter",orderId);
 
 				sqlSession.commit();//提交事务
 
@@ -625,7 +666,7 @@ public class NewOrderController {
 				sqlSession.close();
 			}
 
-			if (addOrderResult == 1 && addEvaluateOrderResult == 1  && updateBalanceResult == 1 && flag)// 保存成功后清空表单数据
+			if (addOrderResult == 1 && addOrderidResult == 1  && updateBalanceResult == 1 && flag)// 保存成功后清空表单数据
 			{
 				infoMessage = "保存成功！";
 				customer = null;
