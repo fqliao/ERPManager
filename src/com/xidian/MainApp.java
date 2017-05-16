@@ -1,7 +1,13 @@
 package com.xidian;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.ibatis.session.SqlSession;
 
@@ -59,6 +65,12 @@ public class MainApp extends Application {
 	private AnchorPane loginView;
 	private List<Address> address;
 
+	private  static  String BACKUP_DIR;
+	private  static  String HOSTNAME;
+	private  static  String DB_USER;
+	private  static  String DB_PWD;
+	private  static  String DB_NAME;
+
 	public MainApp() {
 		super();
 	}
@@ -87,12 +99,47 @@ public class MainApp extends Application {
 	    //正式
 	    showLoginView();
 
-	    //测试
-//	    showMainWindow();
+	    timerBackupDB();
 	}
 
 
+	 public static void timerBackupDB()
+	    {
+	        Runnable runnable = new Runnable() {
+	            public void run() {
+	                try {
+						backupDB();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+	            }
+	        };
+	        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+	        // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
+	        service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.DAYS);
+	    }
 
+	    public static void backupDB() throws IOException, InterruptedException{
+
+			Properties prop = new Properties();
+			InputStream in = MainApp.class.getClassLoader().getResourceAsStream("db.properties");
+			try {
+				prop.load(in);
+				in.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			BACKUP_DIR = prop.getProperty("backdir");
+			HOSTNAME = prop.getProperty("hostname");
+			DB_USER = prop.getProperty("username");
+			DB_PWD = prop.getProperty("password");
+			DB_NAME = prop.getProperty("dbname");
+//	    String savePath = BACKUP_DIR + "manager-backup-" + LocalDateTimeUtil.format(LocalDateTimeUtil.getNow()) + ".sql";
+	      String savePath = BACKUP_DIR + "manager-backup-" + LocalDate.now().toString() + ".sql";
+	      String[] execCMD = new String[] {"mysqldump", "-h" + HOSTNAME, "-u" + DB_USER, "-p" + DB_PWD, DB_NAME,
+	              "-r" + savePath, "--skip-lock-tables"};
+	      Runtime.getRuntime().exec(execCMD);
+	  }
 	/**
 	 * 显示登录界面
 	 */
