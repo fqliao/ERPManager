@@ -11,6 +11,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
 import com.xidian.model.order.Order;
+import com.xidian.util.DateUtil;
 import com.xidian.util.LocalDateTimeUtil;
 import com.xidian.util.MessageUtil;
 import com.xidian.util.MybatisUtils;
@@ -184,11 +185,21 @@ public class QueryOrderController {
 		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
 		List<String> reallyNames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
 		sqlSession.close();
-		deliveryNameBox.getItems().addAll(reallyNames);
-		deliveryNameBox.getSelectionModel().select(SingletonData.getSingletonData().getManagerUser().getReallyname());
+		if(deliveryNameBox != null)
+		{
+			deliveryNameBox.getItems().addAll(reallyNames);
+			deliveryNameBox.getSelectionModel().select(SingletonData.getSingletonData().getManagerUser().getReallyname());
+		}
 		//设置默认起始时间和结束时间
-		startDatePicker.setValue(LocalDate.now().minusMonths(1));
-		endDatePicker.setValue(LocalDate.now());
+		LocalDate now = LocalDate.now();
+		if(startDatePicker != null)
+		{
+			startDatePicker.setValue(now.minusMonths(1));
+		}
+		if(endDatePicker != null)
+		{
+			endDatePicker.setValue(now.plusDays(1));
+		}
 	}
 
 	/**
@@ -424,18 +435,33 @@ public class QueryOrderController {
 	private void handleExportOrder()
 	{
 		int dataSize = orderData.size();
+
 		if(dataSize == 0)
 		{
 			MessageUtil.alertInfo("没有可导出的订单，请先查询订单！");
 			return;
 		}
+		//得到导出的文件路径
+		//导出人姓名
+		String exportUserName = SingletonData.getSingletonData().getManagerUser().getReallyname();
+		FileChooser fileChooser = new FileChooser();
+		FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("excel文件(*.xls)", "*.xls");
+		File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
+		fileChooser.setInitialDirectory(desktopDir);
+		fileChooser.getExtensionFilters().add(extFilter);
+		fileChooser.setInitialFileName("订单-"+exportUserName+LocalDate.now());
+		Stage s = new Stage();
+		File file = fileChooser.showSaveDialog(s);
+		if(file == null) return;
+//		String exportFilePath = file.getAbsolutePath();
+
 		//列头数据
 		String[] titles = {"授权号","串码","代理级别","订单号","快递公司","运单号","产品类型","产品数量(盒)","产品价格(元)","产品合计(元)","发件人","收件人","收件人电话","收件地址","发件时间"};
 
-		File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
-		String desktopPath = desktopDir.getAbsolutePath();
+//		File desktopDir = FileSystemView.getFileSystemView().getHomeDirectory();
+//		String desktopPath = desktopDir.getAbsolutePath();
 		//创建Excel文件
-		File file = new File(desktopPath+"/order-"+LocalDate.now()+".xls");
+//		File file = new File(desktopPath+"/订单信息"+LocalDate.now()+".xls");
 		try {
 			//创建文件
 			file.createNewFile();
@@ -599,11 +625,67 @@ public class QueryOrderController {
 				sheet.addCell(label);
 			}
 
-			String totalNumTitle = "产品数量合计(盒)";
-			label = new jxl.write.Label(0, dataSize+2, totalNumTitle, headerFormat);
-			if(auidLen < totalNumTitle.getBytes().length+4)
+			String exportUserNameTitle = "导出人：";
+			label = new jxl.write.Label(0, dataSize+2, exportUserNameTitle, headerFormat);
+			if(auidLen < exportUserNameTitle.getBytes().length+4)
 			{
-				auidLen = totalNumTitle.getBytes().length+4;
+				auidLen = exportUserNameTitle.getBytes().length+4;
+			}
+			sheet.setColumnView(0,auidLen);
+			sheet.addCell(label);
+
+			//导出人姓名
+			label = new jxl.write.Label(1, dataSize+2, exportUserName, headerFormat);
+			if(auidLen < exportUserName.getBytes().length)
+			{
+				auidLen = exportUserName.getBytes().length;
+			}
+			sheet.setColumnView(0,auidLen);
+			sheet.addCell(label);
+
+			//导出时间段
+			String exportTimeTitle = "导出时间段：";
+			label = new jxl.write.Label(0, dataSize+3, exportTimeTitle, headerFormat);
+			if(auidLen < exportTimeTitle.getBytes().length)
+			{
+				auidLen = exportTimeTitle.getBytes().length;
+			}
+			sheet.setColumnView(0,auidLen);
+			sheet.addCell(label);
+
+			//导出时间段
+			String exportStartTime = "未选择";
+			if(startDatePicker.getValue() != null)
+			{
+				exportStartTime = DateUtil.format(startDatePicker.getValue());
+			}
+			label = new jxl.write.Label(1, dataSize+3, exportStartTime, headerFormat);
+			if(auidLen < exportStartTime.getBytes().length)
+			{
+				auidLen = exportStartTime.getBytes().length;
+			}
+			sheet.setColumnView(1,auidLen);
+			sheet.addCell(label);
+
+			String exportEndTime = "未选择";
+			if(endDatePicker.getValue() != null)
+			{
+				exportEndTime = DateUtil.format(endDatePicker.getValue());
+			}
+			label = new jxl.write.Label(2, dataSize+3, exportEndTime, headerFormat);
+			if(auidLen < exportEndTime.getBytes().length)
+			{
+				auidLen = exportEndTime.getBytes().length;
+			}
+			sheet.setColumnView(2,auidLen);
+			sheet.addCell(label);
+
+			//导出产品数量合计
+			String totalNumTitle = "产品数量合计(盒)：";
+			label = new jxl.write.Label(0, dataSize+4, totalNumTitle, headerFormat);
+			if(auidLen < totalNumTitle.getBytes().length)
+			{
+				auidLen = totalNumTitle.getBytes().length;
 			}
 			sheet.setColumnView(0,auidLen);
 			sheet.addCell(label);
@@ -616,29 +698,30 @@ public class QueryOrderController {
 				totalSum += order.getProductSum();
 			}
 
-			number = new jxl.write.Number(1, dataSize+2, totalNum, headerFormat);
-			if(codeLen < (totalNum+"").getBytes().length+8)
+			number = new jxl.write.Number(1, dataSize+4, totalNum, headerFormat);
+			if(codeLen < (totalNum+"").getBytes().length)
 			{
-				codeLen = (totalNum+"").getBytes().length+8;
+				codeLen = (totalNum+"").getBytes().length;
 			}
-			sheet.setColumnView(0,codeLen);
+			sheet.setColumnView(1,codeLen);
 			sheet.addCell(number);
 
-			String totalSumTitle = "产品货款合计(元)";
-			label = new jxl.write.Label(0, dataSize+3, totalSumTitle, headerFormat);
-			if(auidLen < totalSumTitle.getBytes().length+4)
+			//导出产品货款合计
+			String totalSumTitle = "产品货款合计(元)：";
+			label = new jxl.write.Label(0, dataSize+5, totalSumTitle, headerFormat);
+			if(auidLen < totalSumTitle.getBytes().length)
 			{
-				auidLen = totalSumTitle.getBytes().length+4;
+				auidLen = totalSumTitle.getBytes().length;
 			}
 			sheet.setColumnView(0,auidLen);
 			sheet.addCell(label);
 
-			number = new jxl.write.Number(1, dataSize+3, totalSum, headerFormat);
-			if(codeLen < (totalSum+"").getBytes().length+8)
+			number = new jxl.write.Number(1, dataSize+5, totalSum, headerFormat);
+			if(codeLen < (totalSum+"").getBytes().length)
 			{
-				codeLen = (totalSum+"").getBytes().length+8;
+				codeLen = (totalSum+"").getBytes().length;
 			}
-			sheet.setColumnView(0,codeLen);
+			sheet.setColumnView(1,codeLen);
 			sheet.addCell(number);
 
 			//写入工作簿
