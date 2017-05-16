@@ -17,6 +17,8 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -24,6 +26,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.stage.Stage;
 
 public class ConfirmPasswordController{
@@ -38,7 +41,13 @@ public class ConfirmPasswordController{
 	private Label infoLabel;
 
 	@FXML
+	private Label resultLabel;
+
+	@FXML
 	private ProgressBar progressBar;
+
+	@FXML
+	private Button okButton;
 
 
 
@@ -119,7 +128,8 @@ public class ConfirmPasswordController{
 					};
 					progressBar.visibleProperty().bind(task.runningProperty());
 					infoLabel.visibleProperty().bind(task.runningProperty());
-					passwordLabel.textProperty().bind(task.valueProperty());
+					resultLabel.textProperty().bind(task.valueProperty());
+					okButton.visibleProperty().bind(task.runningProperty());
 					Thread thread = new Thread(task);
 					thread.start();
 				}

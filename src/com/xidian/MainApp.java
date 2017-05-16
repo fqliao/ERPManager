@@ -1,5 +1,6 @@
 package com.xidian;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
@@ -134,12 +135,68 @@ public class MainApp extends Application {
 			DB_USER = prop.getProperty("username");
 			DB_PWD = prop.getProperty("password");
 			DB_NAME = prop.getProperty("dbname");
-//	    String savePath = BACKUP_DIR + "manager-backup-" + LocalDateTimeUtil.format(LocalDateTimeUtil.getNow()) + ".sql";
+
+			deleteThreeDaysAgoFile(BACKUP_DIR); //删除前三条的备份数据
+
+//	      String savePath = BACKUP_DIR + "manager-backup-" + LocalDateTimeUtil.format(LocalDateTimeUtil.getNow()) + ".sql";
 	      String savePath = BACKUP_DIR + "manager-backup-" + LocalDate.now().toString() + ".sql";
 	      String[] execCMD = new String[] {"mysqldump", "-h" + HOSTNAME, "-u" + DB_USER, "-p" + DB_PWD, DB_NAME,
 	              "-r" + savePath, "--skip-lock-tables"};
 	      Runtime.getRuntime().exec(execCMD);
 	  }
+
+		private static void deleteThreeDaysAgoFile(String directorySql) {
+
+	        File managerData = new File(directorySql);
+	    	File[] listSqlFiles = null;
+	    	if(managerData!=null){
+	            if(managerData.isDirectory()){
+	            	listSqlFiles = managerData.listFiles();
+	            }
+	        }
+	    	if(listSqlFiles != null)
+	    	{
+	            for (File file : listSqlFiles)
+	            {
+	    			LocalDate now = LocalDate.now();
+	    			String path = file.getPath();
+	    			if(!(path.contains(now.toString()) ||
+	    			   path.contains(now.minusDays(1).toString())||
+	    			   path.contains(now.minusDays(2).toString())))
+	    			{
+	    				System.out.println(deleteFile(path));;
+	    			}
+	    		}
+	    	}
+	    	else
+	    	{
+	    		managerData.mkdir();
+	    	}
+		}
+
+	    /**
+	     * 删除单个文件
+	     *
+	     * @param fileName
+	     *            要删除的文件的文件名
+	     * @return 单个文件删除成功返回true，否则返回false
+	     */
+	    public static boolean deleteFile(String fileName) {
+	        File file = new File(fileName);
+	        // 如果文件路径所对应的文件存在，并且是一个文件，则直接删除
+	        if (file.exists() && file.isFile()) {
+	            if (file.delete()) {
+	                System.out.println("删除单个文件" + fileName + "成功！");
+	                return true;
+	            } else {
+	                System.out.println("删除单个文件" + fileName + "失败！");
+	                return false;
+	            }
+	        } else {
+	            System.out.println("删除单个文件失败：" + fileName + "不存在！");
+	            return false;
+	        }
+	    }
 	/**
 	 * 显示登录界面
 	 */
