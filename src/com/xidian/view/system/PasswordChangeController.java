@@ -11,6 +11,7 @@ import com.xidian.MainApp;
 import com.xidian.model.system.ManagerUser;
 import com.xidian.util.EncryptBySaltUtil;
 import com.xidian.util.MessageUtil;
+import com.xidian.util.SingletonData;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
@@ -60,18 +61,18 @@ public class PasswordChangeController {
 			return;
 		}
 		// 读取文件获得登陆用户名
-		String username = "";
-		FileReader fileReader = null;
-		BufferedReader bufferedReader = null;
-		try {
-			fileReader = new FileReader(new File("username.txt"));
-			bufferedReader = new BufferedReader(fileReader);
-			username = bufferedReader.readLine();
-			bufferedReader.close();
-			fileReader.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		String username = SingletonData.getSingletonData().getManagerUser().getUsername();
+//		FileReader fileReader = null;
+//		BufferedReader bufferedReader = null;
+//		try {
+//			fileReader = new FileReader(new File("username.txt"));
+//			bufferedReader = new BufferedReader(fileReader);
+//			username = bufferedReader.readLine();
+//			bufferedReader.close();
+//			fileReader.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		SqlSession sqlSession = null;
 		String message = "";

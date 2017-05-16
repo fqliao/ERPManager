@@ -44,6 +44,9 @@ public class MainController {
 	@FXML
 	private Button restoreButton;
 
+	@FXML
+	private Button editProductTypeButton;
+
 	public MainController() {
 
 	}
@@ -63,6 +66,7 @@ public class MainController {
 			newManagerUserButton.setVisible(false);
 			queryAndEditManagerUserButton.setVisible(false);
 			restoreButton.setVisible(false);
+			editProductTypeButton.setVisible(false);
 		}
 	}
 
