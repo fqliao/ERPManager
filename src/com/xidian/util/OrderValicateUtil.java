@@ -16,6 +16,15 @@ public class OrderValicateUtil {
 		if (order.getAuId() == null || order.getAuId().length() == 0) {
 			errorMessage += "请输入授权号!\n";
 		}
+		if (order.getReceiverName() == null ||order.getReceiverName().length() == 0) {
+			errorMessage += "请选择收件人!\n";
+		}
+		if (order.getReceiverPhone() == null || order.getReceiverPhone().length() == 0) {
+			errorMessage += "请选择收件电话!\n";
+		}
+		if (order.getReceiverAddress() == null || order.getReceiverAddress().length() == 0) {
+			errorMessage += "请选择收件地址!\n";
+		}
 		if (order.getOrderId() == null || order.getOrderId().length() == 0) {
 			errorMessage += "请输入订单号!\n";
 		}

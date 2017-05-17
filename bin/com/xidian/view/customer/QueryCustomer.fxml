@@ -38,7 +38,7 @@
       </TableView>
       <TextField fx:id="customernameField" layoutX="549.0" layoutY="14.0" prefHeight="25.0" />
       <Label layoutX="516.0" layoutY="18.0" text="姓名" />
-      <Label layoutX="492.0" layoutY="50.0" text="省份证号" />
+      <Label layoutX="492.0" layoutY="50.0" text="身份证号" />
       <TextField fx:id="idcardField" layoutX="549.0" layoutY="46.0" prefHeight="25.0" />
       <ComboBox fx:id="stateBox" layoutX="793.0" layoutY="47.0" prefWidth="80.0" />
       <Label layoutX="758.0" layoutY="51.0" text="状态" />

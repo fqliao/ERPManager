@@ -556,11 +556,6 @@ public class NewOrderController {
 		//正式
 		order.setOrderId(orderIdField.getText());
 
-		//测试
-//		Random random = new Random();
-//		order.setOrderId(random .nextInt(1000000000)+"");
-//		order.setWayBillNumber(random .nextInt(1000000000)+"");
-
 		order.setProductPrice(Integer.parseInt(productPriceBox.getSelectionModel().getSelectedItem()));
 		order.setReceiverName(receiverNameField.getText());
 		order.setReceiverPhone(receiverPhoneField.getText());

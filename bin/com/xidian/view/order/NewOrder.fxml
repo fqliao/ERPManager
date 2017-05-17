@@ -44,7 +44,7 @@
                   <Label text="收件人" GridPane.rowIndex="4" />
                   <Label text="收件电话" GridPane.rowIndex="5" />
                   <TextField fx:id="auIdField" prefHeight="30.0" prefWidth="307.0" promptText="必填" GridPane.columnIndex="1" />
-                  <TextField fx:id="orderIdField" prefHeight="30.0" promptText="必填" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                  <TextField fx:id="orderIdField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
                   <TextField fx:id="productNumField" prefHeight="30.0" promptText="必填" GridPane.columnIndex="1" GridPane.rowIndex="9" />
                   <TextField fx:id="receiverNameField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <ComboBox fx:id="rankBox" prefHeight="24.0" prefWidth="92.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
