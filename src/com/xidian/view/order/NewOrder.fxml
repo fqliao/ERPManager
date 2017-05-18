@@ -53,7 +53,7 @@
                   <Label text="收件地址" GridPane.rowIndex="6" />
                   <ComboBox fx:id="productPriceBox" prefHeight="24.0" prefWidth="92.0" GridPane.columnIndex="1" GridPane.rowIndex="8" />
                   <Label text="运单号*" GridPane.rowIndex="13" />
-                  <TextField fx:id="wayBillNumberField" prefHeight="30.0" prefWidth="357.0" promptText="必填，多个运单号用|分隔" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+                  <TextField fx:id="wayBillNumberField" prefHeight="30.0" prefWidth="357.0" promptText="必填，多个运单号用逗号分隔" GridPane.columnIndex="1" GridPane.rowIndex="13" />
                   <Label text="产品合计(元)" GridPane.rowIndex="10" />
                   <Label fx:id="totalLabel" GridPane.columnIndex="1" GridPane.rowIndex="10">
                      <GridPane.margin>

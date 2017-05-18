@@ -3,6 +3,7 @@ package com.xidian.view.order;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -564,14 +565,19 @@ public class NewOrderController {
 		order.setRank(newRank);
 		order.setDeliveryName(deliveryNameField.getText());
 		List<String> selectedItem = selectedExpressBox.getItems();
-		String[] wayBillNumbers = wayBillNumberField.getText().split("\\|");
+		if("".equals(wayBillNumberField.getText().trim()))
+		{
+			MessageUtil.alertInfo("请输入运单号");
+			return;
+		}
+		String[] wayBillNumbers = wayBillNumberField.getText().replace(",", "，").split("，");
 		if(wayBillNumbers.length != selectedItem.size())
 		{
 			MessageUtil.alertInfo("快递公司和运单号要一一对应");
 			return;
 		}
 		order.setExpress(selectedItem.toString());
-		order.setWayBillNumber(wayBillNumberField.getText());
+		order.setWayBillNumber(Arrays.toString(wayBillNumbers));
 
 		String productNum = productNumField.getText();
 
@@ -590,6 +596,7 @@ public class NewOrderController {
 			message.append("\n授权号：" + order.getAuId());
 			message.append("\n收件人：" + order.getReceiverName());
 			message.append("\n订单号：" + order.getOrderId());
+			message.append("\n快递公司：" + order.getExpress());
 			message.append("\n运单号：" + order.getWayBillNumber());
 			message.append("\n产品数量(盒)：" + order.getProductNum());
 			int totalSum = Integer.parseInt(totalLabel.getText());
