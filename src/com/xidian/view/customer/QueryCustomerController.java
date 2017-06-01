@@ -246,107 +246,76 @@ public class QueryCustomerController {
 			customer.setState("");
 		}
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getCustomers", customer);
+			customerData.addAll(customers);
 
-		List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getCustomers", customer);
-		customerData.addAll(customers);
-//		// 通过授权号查询客户信息
-//		if (!"".equals(auid.trim())) {
-//			Customer customerByAuid = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", "%"+auid+"%");
-//			if(customerByAuid == null)
-//			{
-//				return;
-//			}
-//			customerData.add(customerByAuid);
-//		} else {
-//			// 如果没有查询信息，则全部查询
-//			if (("".equals(customerName.trim())) && ("请选择".equals(rank))) {
-//				List<Customer> customers = sqlSession.selectList("com.xidian.CustomerXml.getAllCustomer");
-//				customerData.addAll(customers);
-//			}
-//			// 通过代理级别查询客户信息
-//			if (("".equals(customerName.trim())) && (!"请选择".equals(rank))) {
-//				List<Customer> customersByRank = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByRank",
-//						rank);
-//				customerData.addAll(customersByRank);
-//			}
-//
-//			// 通过客户姓名查询客户信息
-//			if ((!"".equals(customerName.trim())) && ("请选择".equals(rank))) {
-//				List<Customer> customersByName = sqlSession.selectList("com.xidian.CustomerXml.getCustomerByName",
-//						"%"+customerName+"%");
-//				customerData.addAll(customersByName);
-//			}
-//
-//			// 通过代理级别和客户姓名查询客户信息
-//			if ((!"".equals(customerName.trim())) && (!"请选择".equals(rank))) {
-//				customer.setRank(rank);
-//				customer.setCustomerName("%"+customerName+"%");
-//				List<Customer> customersByRankAndName = sqlSession
-//						.selectList("com.xidian.CustomerXml.getCustomerByRankAndName", customer);
-//				customerData.addAll(customersByRankAndName);
-//			}
-//		}
+			//表中放数据
+			customerTable.setItems(customerData);
 
-		//表中放数据
-		customerTable.setItems(customerData);
+			//设置显示过滤列的菜单按钮
+			customerTable.setTableMenuButtonVisible(true);
 
-		//设置显示过滤列的菜单按钮
-		customerTable.setTableMenuButtonVisible(true);
+			// 设置列中的文本居中
+			auidColumn.setStyle( "-fx-alignment: CENTER;");
+			codeColumn.setStyle( "-fx-alignment: CENTER;");
+			rankColumn.setStyle( "-fx-alignment: CENTER;");
+			customernameColumn.setStyle( "-fx-alignment: CENTER;");
+			sexColumn.setStyle( "-fx-alignment: CENTER;");
+			ageColumn.setStyle( "-fx-alignment: CENTER;");
+			idcardColumn.setStyle( "-fx-alignment: CENTER;");
+			addressColumn.setStyle( "-fx-alignment: CENTER;");
+			phoneColumn.setStyle( "-fx-alignment: CENTER;");
+			qqColumn.setStyle( "-fx-alignment: CENTER;");
+			weixinColumn.setStyle( "-fx-alignment: CENTER;");
+			balanceColumn.setStyle("-fx-alignment: CENTER;");
+			stateColumn.setStyle( "-fx-alignment: CENTER;");
+			remarkColumn.setStyle( "-fx-alignment: CENTER;");
+//			isUpgradeColumn.setStyle( "-fx-alignment: CENTER;");
 
-		// 设置列中的文本居中
-		auidColumn.setStyle( "-fx-alignment: CENTER;");
-		codeColumn.setStyle( "-fx-alignment: CENTER;");
-		rankColumn.setStyle( "-fx-alignment: CENTER;");
-		customernameColumn.setStyle( "-fx-alignment: CENTER;");
-		sexColumn.setStyle( "-fx-alignment: CENTER;");
-		ageColumn.setStyle( "-fx-alignment: CENTER;");
-		idcardColumn.setStyle( "-fx-alignment: CENTER;");
-		addressColumn.setStyle( "-fx-alignment: CENTER;");
-		phoneColumn.setStyle( "-fx-alignment: CENTER;");
-		qqColumn.setStyle( "-fx-alignment: CENTER;");
-		weixinColumn.setStyle( "-fx-alignment: CENTER;");
-		balanceColumn.setStyle("-fx-alignment: CENTER;");
-		stateColumn.setStyle( "-fx-alignment: CENTER;");
-		remarkColumn.setStyle( "-fx-alignment: CENTER;");
-//		isUpgradeColumn.setStyle( "-fx-alignment: CENTER;");
+			// 将数据放入表中的列
+			auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
+			codeColumn.setCellValueFactory(cellData -> cellData.getValue().codeProperty());
+			rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+			customernameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
+			sexColumn.setCellValueFactory(cellData -> cellData.getValue().sexProperty());
+			ageColumn.setCellValueFactory(cellData -> cellData.getValue().ageProperty().asObject());
+			idcardColumn.setCellValueFactory(cellData -> cellData.getValue().idcardProperty());
+			addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
+			phoneColumn.setCellValueFactory(cellData -> cellData.getValue().phoneProperty());
+			qqColumn.setCellValueFactory(cellData -> cellData.getValue().qqProperty());
+			weixinColumn.setCellValueFactory(cellData -> cellData.getValue().weixinProperty());
+			balanceColumn.setCellValueFactory(cellData -> cellData.getValue().balanceProperty().asObject());
+			stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
+			remarkColumn.setCellValueFactory(cellData -> cellData.getValue().remarkProperty());
+//			isUpgradeColumn.setCellValueFactory(cellData -> cellData.getValue().isUpgradeProperty());
 
-		// 将数据放入表中的列
-		auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
-		codeColumn.setCellValueFactory(cellData -> cellData.getValue().codeProperty());
-		rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
-		customernameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
-		sexColumn.setCellValueFactory(cellData -> cellData.getValue().sexProperty());
-		ageColumn.setCellValueFactory(cellData -> cellData.getValue().ageProperty().asObject());
-		idcardColumn.setCellValueFactory(cellData -> cellData.getValue().idcardProperty());
-		addressColumn.setCellValueFactory(cellData -> cellData.getValue().addressProperty());
-		phoneColumn.setCellValueFactory(cellData -> cellData.getValue().phoneProperty());
-		qqColumn.setCellValueFactory(cellData -> cellData.getValue().qqProperty());
-		weixinColumn.setCellValueFactory(cellData -> cellData.getValue().weixinProperty());
-		balanceColumn.setCellValueFactory(cellData -> cellData.getValue().balanceProperty().asObject());
-		stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
-		remarkColumn.setCellValueFactory(cellData -> cellData.getValue().remarkProperty());
-//		isUpgradeColumn.setCellValueFactory(cellData -> cellData.getValue().isUpgradeProperty());
-
-		//设置每一列的双击事件
-		CustomerStringCellFactory stringCellFactory = new CustomerStringCellFactory();
-		CustomerIntegerCellFactory intCellFactory = new CustomerIntegerCellFactory();
-		auidColumn.setCellFactory(stringCellFactory);
-		codeColumn.setCellFactory(stringCellFactory);
-		rankColumn.setCellFactory(stringCellFactory);
-		customernameColumn.setCellFactory(stringCellFactory);
-		sexColumn.setCellFactory(stringCellFactory);
-		ageColumn.setCellFactory(intCellFactory);
-		idcardColumn.setCellFactory(stringCellFactory);
-		addressColumn.setCellFactory(stringCellFactory);
-		phoneColumn.setCellFactory(stringCellFactory);
-		qqColumn.setCellFactory(stringCellFactory);
-		weixinColumn.setCellFactory(stringCellFactory);
-		balanceColumn.setCellFactory(intCellFactory);
-		stateColumn.setCellFactory(stringCellFactory);
-		remarkColumn.setCellFactory(stringCellFactory);
-//		isUpgradeColumn.setCellFactory(stringCellFactory);
-
+			//设置每一列的双击事件
+			CustomerStringCellFactory stringCellFactory = new CustomerStringCellFactory();
+			CustomerIntegerCellFactory intCellFactory = new CustomerIntegerCellFactory();
+			auidColumn.setCellFactory(stringCellFactory);
+			codeColumn.setCellFactory(stringCellFactory);
+			rankColumn.setCellFactory(stringCellFactory);
+			customernameColumn.setCellFactory(stringCellFactory);
+			sexColumn.setCellFactory(stringCellFactory);
+			ageColumn.setCellFactory(intCellFactory);
+			idcardColumn.setCellFactory(stringCellFactory);
+			addressColumn.setCellFactory(stringCellFactory);
+			phoneColumn.setCellFactory(stringCellFactory);
+			qqColumn.setCellFactory(stringCellFactory);
+			weixinColumn.setCellFactory(stringCellFactory);
+			balanceColumn.setCellFactory(intCellFactory);
+			stateColumn.setCellFactory(stringCellFactory);
+			remarkColumn.setCellFactory(stringCellFactory);
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
 	}
 
 }

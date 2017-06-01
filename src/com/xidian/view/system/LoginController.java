@@ -60,10 +60,12 @@ public class LoginController {
 	@FXML
 	private void handleLogin()
 	{
+		messageLabel.setText("");
 		String username = usernameField.getText();
 		String password = passwordField.getText();
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
 		try {
+			sqlSession = mainApp.getSqlSession(true);
 			managerUser = sqlSession.selectOne("com.xidian.ManagerUserXml.getManagerUser", username);
 			if(managerUser != null)
 			{
@@ -84,6 +86,9 @@ public class LoginController {
 			{
 				messageLabel.setText("用户名或密码错误！");
 			}
+		}
+		catch (Exception e) {
+			messageLabel.setText("登录超时，请检查您是否有网络！");
 		}
 		finally{
 			sqlSession.close();

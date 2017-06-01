@@ -7,6 +7,8 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
 import com.xidian.model.updateinfo.UpdateInfo;
+import com.xidian.util.MessageUtil;
+import com.xidian.util.MybatisUtils;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -175,68 +177,68 @@ public class QueryUpdateInfoController {
 		String auid = auidField.getText();
 		String customerName = customernameField.getText();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			// 通过授权号查询客户信息
+			if (!"".equals(auid.trim())) {
+				List<UpdateInfo> updateInfoByAuid = sqlSession.selectList("com.xidian.UpdateInfoXml.getUpdateInfoByAuid", "%"+auid+"%");
+				updateInfoData.addAll(updateInfoByAuid);
+			} else {
+				// 如果没有查询信息，则全部查询
+				if (("".equals(customerName.trim()))) {
+					List<UpdateInfo> updateInfos = sqlSession.selectList("com.xidian.UpdateInfoXml.getAllUpdateInfo");
+					updateInfoData.addAll(updateInfos);
+				}
 
-		// 通过授权号查询客户信息
-		if (!"".equals(auid.trim())) {
-			List<UpdateInfo> updateInfoByAuid = sqlSession.selectList("com.xidian.UpdateInfoXml.getUpdateInfoByAuid", "%"+auid+"%");
-			updateInfoData.addAll(updateInfoByAuid);
-		} else {
-			// 如果没有查询信息，则全部查询
-			if (("".equals(customerName.trim()))) {
-				List<UpdateInfo> updateInfos = sqlSession.selectList("com.xidian.UpdateInfoXml.getAllUpdateInfo");
-				updateInfoData.addAll(updateInfos);
+				// 通过客户姓名查询客户信息
+				if ((!"".equals(customerName.trim()))) {
+					List<UpdateInfo> updateInfosByName = sqlSession.selectList("com.xidian.UpdateInfoXml.getUpdateInfoByName",
+							"%"+customerName+"%");
+					updateInfoData.addAll(updateInfosByName);
+				}
+
 			}
 
-			// 通过客户姓名查询客户信息
-			if ((!"".equals(customerName.trim()))) {
-				List<UpdateInfo> updateInfosByName = sqlSession.selectList("com.xidian.UpdateInfoXml.getUpdateInfoByName",
-						"%"+customerName+"%");
-				updateInfoData.addAll(updateInfosByName);
-			}
+			//表中放数据
+			updateInfoTable.setItems(updateInfoData);
 
+			//设置显示过滤列的菜单按钮
+			updateInfoTable.setTableMenuButtonVisible(true);
+
+			// 设置列中的文本居中
+			auidColumn.setStyle( "-fx-alignment: CENTER;");
+			rankColumn.setStyle( "-fx-alignment: CENTER;");
+			customernameColumn.setStyle( "-fx-alignment: CENTER;");
+			stateColumn.setStyle("-fx-alignment: CENTER;");
+			updateTimeColumn.setStyle( "-fx-alignment: CENTER;");
+			updateReasonColumn.setStyle( "-fx-alignment: CENTER;");
+
+			// 将数据放入表中的列
+			auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
+			rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+			customernameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
+			stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
+			updateTimeColumn.setCellValueFactory(cellData -> cellData.getValue().updateTimeProperty());
+			updateReasonColumn.setCellValueFactory(cellData -> cellData.getValue().updateReasonProperty());
+
+			//设置每一列的双击事件
+			auidColumn.setCellFactory(new UpdateInfoStringCellFactory());
+			rankColumn.setCellFactory(new UpdateInfoStringCellFactory());
+			customernameColumn.setCellFactory(new UpdateInfoStringCellFactory());
+			stateColumn.setCellFactory(new UpdateInfoStringCellFactory());
+			updateTimeColumn.setCellFactory(new UpdateInfoLocalDateTimeCellFactory());
+			updateReasonColumn.setCellFactory(new UpdateInfoStringCellFactory());
+		}
+		catch (Exception e)
+		{
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
 		}
 
-		//表中放数据
-		updateInfoTable.setItems(updateInfoData);
-
-		//设置显示过滤列的菜单按钮
-		updateInfoTable.setTableMenuButtonVisible(true);
-
-		// 设置列中的文本居中
-		auidColumn.setStyle( "-fx-alignment: CENTER;");
-		rankColumn.setStyle( "-fx-alignment: CENTER;");
-		customernameColumn.setStyle( "-fx-alignment: CENTER;");
-		stateColumn.setStyle("-fx-alignment: CENTER;");
-		updateTimeColumn.setStyle( "-fx-alignment: CENTER;");
-		updateReasonColumn.setStyle( "-fx-alignment: CENTER;");
-
-		// 将数据放入表中的列
-		auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
-		rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
-		customernameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
-		stateColumn.setCellValueFactory(cellData -> cellData.getValue().stateProperty());
-		updateTimeColumn.setCellValueFactory(cellData -> cellData.getValue().updateTimeProperty());
-		updateReasonColumn.setCellValueFactory(cellData -> cellData.getValue().updateReasonProperty());
-
-		//设置每一列的双击事件
-		auidColumn.setCellFactory(new UpdateInfoStringCellFactory());
-		rankColumn.setCellFactory(new UpdateInfoStringCellFactory());
-		customernameColumn.setCellFactory(new UpdateInfoStringCellFactory());
-		stateColumn.setCellFactory(new UpdateInfoStringCellFactory());
-		updateTimeColumn.setCellFactory(new UpdateInfoLocalDateTimeCellFactory());
-		updateReasonColumn.setCellFactory(new UpdateInfoStringCellFactory());
-
-	}
-
-	/**
-	 * 修改客户信息
-	 */
-	@FXML
-	private void handleShutWindow()
-	{
-
-		addStage.close();
 	}
 
 }

@@ -155,53 +155,60 @@ public class QueryAddressController {
 		String auid = auidField.getText();
 		String receiverName = receiverNameField.getText();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-
-		List<Address> addresss;
-		// 通过授权号查询客户信息
-		if (!"".equals(auid.trim())) {
-			addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAddressByAuid", "%"+auid.trim()+"%");
-			addressData.addAll(addresss);
-		} else {
-			// 如果没有查询信息，则全部查询
-			if (("".equals(receiverName.trim()))) {
-				addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAllAddress");
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			List<Address> addresss;
+			// 通过授权号查询客户信息
+			if (!"".equals(auid.trim())) {
+				addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAddressByAuid", "%"+auid.trim()+"%");
 				addressData.addAll(addresss);
-			}
+			} else {
+				// 如果没有查询信息，则全部查询
+				if (("".equals(receiverName.trim()))) {
+					addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAllAddress");
+					addressData.addAll(addresss);
+				}
 
-			// 通过收件人姓名查询客户信息
-			if ((!"".equals(receiverName.trim()))) {
-				addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAddressByName",
-						"%"+receiverName.trim()+"%");
-				addressData.addAll(addresss);
-			}
+				// 通过收件人姓名查询客户信息
+				if ((!"".equals(receiverName.trim()))) {
+					addresss = sqlSession.selectList("com.xidian.model.address.AddressXml.getAddressByName",
+							"%"+receiverName.trim()+"%");
+					addressData.addAll(addresss);
+				}
 
+			}
+			//表中放数据
+			addressTable.setItems(addressData);
+
+			//设置显示过滤列的菜单按钮
+			addressTable.setTableMenuButtonVisible(true);
+
+			// 设置列中的文本居中
+			auidColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverNameColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverAddressColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverPhoneColumn.setStyle("-fx-alignment: CENTER;");
+
+			// 将数据放入表中的列
+			auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
+			receiverNameColumn.setCellValueFactory(cellData -> cellData.getValue().receiverNameProperty());
+			receiverAddressColumn.setCellValueFactory(cellData -> cellData.getValue().receiverAddressProperty());
+			receiverPhoneColumn.setCellValueFactory(cellData -> cellData.getValue().receiverPhoneProperty());
+
+			//设置每一列的双击事件
+			AddressStringCellFactory addressCellFactory = new AddressStringCellFactory();
+			auidColumn.setCellFactory(addressCellFactory);
+			receiverNameColumn.setCellFactory(addressCellFactory);
+			receiverAddressColumn.setCellFactory(addressCellFactory);
+			receiverPhoneColumn.setCellFactory(addressCellFactory);
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
-
-		//表中放数据
-		addressTable.setItems(addressData);
-
-		//设置显示过滤列的菜单按钮
-		addressTable.setTableMenuButtonVisible(true);
-
-		// 设置列中的文本居中
-		auidColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverNameColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverAddressColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverPhoneColumn.setStyle("-fx-alignment: CENTER;");
-
-		// 将数据放入表中的列
-		auidColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
-		receiverNameColumn.setCellValueFactory(cellData -> cellData.getValue().receiverNameProperty());
-		receiverAddressColumn.setCellValueFactory(cellData -> cellData.getValue().receiverAddressProperty());
-		receiverPhoneColumn.setCellValueFactory(cellData -> cellData.getValue().receiverPhoneProperty());
-
-		//设置每一列的双击事件
-		AddressStringCellFactory addressCellFactory = new AddressStringCellFactory();
-		auidColumn.setCellFactory(addressCellFactory);
-		receiverNameColumn.setCellFactory(addressCellFactory);
-		receiverAddressColumn.setCellFactory(addressCellFactory);
-		receiverPhoneColumn.setCellFactory(addressCellFactory);
+		finally
+		{
+			sqlSession.close();
+		}
 
 	}
 
@@ -256,22 +263,31 @@ public class QueryAddressController {
 		}
 		else
 		{
-			SqlSession sqlSession = mainApp.getSqlSession(true);// 非自动提交，可用于事务
-
-			int editAddressResult = 0;
-
+			SqlSession sqlSession = null;
 			try {
-				editAddressResult = sqlSession.update("com.xidian.model.address.AddressXml.updateAddress", addressSelect);
-			} finally {
-				sqlSession.close();
-				if (editAddressResult == 1) {
-					message = "修改成功！";
-				} else {
-					message = "修改失敗!";
+				sqlSession = mainApp.getSqlSession(true);
+				int editAddressResult = 0;
+
+				try {
+					editAddressResult = sqlSession.update("com.xidian.model.address.AddressXml.updateAddress", addressSelect);
+				} finally {
+					sqlSession.close();
+					if (editAddressResult == 1) {
+						message = "修改成功！";
+					} else {
+						message = "修改失敗!";
+					}
 				}
+				MessageUtil.alertInfo(message);
+				addStage.close();
+			} catch (Exception e) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
 			}
-			MessageUtil.alertInfo(message);
-			addStage.close();
+			finally
+			{
+				sqlSession.close();
+			}
+
 		}
 
 	}
@@ -284,26 +300,35 @@ public class QueryAddressController {
 		if(MessageUtil.alertConfirm("提示", "确认删除吗"))
 		{
 
-			SqlSession sqlSession = mainApp.getSqlSession(true);
-			int deleteResult = 0;
-			try
-			{
-				deleteResult = sqlSession.delete("com.xidian.model.address.AddressXml.deleteAddress",address.getId());
+			SqlSession sqlSession = null;
+			try {
+				sqlSession = mainApp.getSqlSession(true);
+				int deleteResult = 0;
+				try
+				{
+					deleteResult = sqlSession.delete("com.xidian.model.address.AddressXml.deleteAddress",address.getId());
+				}
+				finally
+				{
+					if(deleteResult == 1)
+					{
+//						int selectedIndex = addressTable.getSelectionModel().getSelectedIndex();
+//						addressTable.getItems().remove(selectedIndex);
+						message = "删除成功！";
+						queryAddressController.addressTable.getItems().remove(address);
+
+					}
+					else
+					{
+						message = "删除失败！";
+					}
+				}
+			} catch (Exception e) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
 			}
 			finally
 			{
-				if(deleteResult == 1)
-				{
-//					int selectedIndex = addressTable.getSelectionModel().getSelectedIndex();
-//					addressTable.getItems().remove(selectedIndex);
-					message = "删除成功！";
-					queryAddressController.addressTable.getItems().remove(address);
-
-				}
-				else
-				{
-					message = "删除失败！";
-				}
+				sqlSession.close();
 			}
 
 		}

@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import com.xidian.MainApp;
 import com.xidian.model.order.Order;
 import com.xidian.model.rank.Rank;
+import com.xidian.util.MessageUtil;
 import com.xidian.util.MybatisUtils;
 
 import javafx.collections.FXCollections;
@@ -87,22 +88,32 @@ public class QueryRankController {
 
 	@FXML
 	private void initialize() {
-		SqlSession sqlSession2 = MybatisUtils.getSqlSession(true);
-		//查询代理级别
-		List<String> ranks = sqlSession2.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-		rankBox.getItems().removeAll(rankBox.getItems());
-		rankBox.getItems().add("请选择");
-		rankBox.getItems().addAll(ranks);
-		rankBox.getSelectionModel().selectFirst();
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			//查询代理级别
+			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+			rankBox.getItems().removeAll(rankBox.getItems());
+			rankBox.getItems().add("请选择");
+			rankBox.getItems().addAll(ranks);
+			rankBox.getSelectionModel().selectFirst();
 
-		//查询产品类别
-		List<String> productTypes = sqlSession2.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
-		productTypeBox.getItems().removeAll(productTypeBox.getItems());
-		productTypeBox.getItems().add("请选择");
-		productTypeBox.getItems().addAll(productTypes);
-		productTypeBox.getSelectionModel().selectFirst();
+			//查询产品类别
+			List<String> productTypes = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
+			productTypeBox.getItems().removeAll(productTypeBox.getItems());
+			productTypeBox.getItems().add("请选择");
+			productTypeBox.getItems().addAll(productTypes);
+			productTypeBox.getSelectionModel().selectFirst();
+		}
+		catch (Exception e)
+		{
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
 
-		sqlSession2.close();
 	}
 
 	/**定义列的点击事件类
@@ -174,73 +185,74 @@ public class QueryRankController {
 		String rankString = rankBox.getSelectionModel().getSelectedItem().trim();
 		String productTypeString = productTypeBox.getSelectionModel().getSelectedItem().trim();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			Rank rank = new Rank();
+			if(!"请选择".equals(rankString))
+			{
+				rank.setRank(rankString);
+			}
+			else
+			{
+				rank.setRank("");
+			}
+			if(!"请选择".equals(productTypeString))
+			{
+				rank.setProducttype(productTypeString);
+			}
+			else
+			{
+				rank.setProducttype("");
+			}
+			List<Rank> ranks;
+			ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRank", rank);
+			rankData.addAll(ranks);
 
-		Rank rank = new Rank();
-		if(!"请选择".equals(rankString))
-		{
-			rank.setRank(rankString);
+			//表中放数据
+			rankTable.setItems(rankData);
+
+			//设置显示过滤列的菜单按钮
+			rankTable.setTableMenuButtonVisible(true);
+
+			// 设置列中的文本居中
+			rankColumn.setStyle( "-fx-alignment: CENTER;");
+			productNumColumn.setStyle( "-fx-alignment: CENTER;");
+			productPriceColumn.setStyle( "-fx-alignment: CENTER;");
+			productSumColumn.setStyle("-fx-alignment: CENTER;");
+			producttypeColumn.setStyle("-fx-alignment: CENTER;");
+			createtimeColumn.setStyle("-fx-alignment: CENTER;");
+			updatetimeColumn.setStyle("-fx-alignment: CENTER;");
+
+			// 将数据放入表中的列
+			rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+			productNumColumn.setCellValueFactory(cellData -> cellData.getValue().productNumProperty().asObject());
+			productPriceColumn.setCellValueFactory(cellData -> cellData.getValue().productPriceProperty().asObject());
+			productSumColumn.setCellValueFactory(cellData -> cellData.getValue().productSumProperty().asObject());
+			producttypeColumn.setCellValueFactory(cellData -> cellData.getValue().producttypeProperty());
+			createtimeColumn.setCellValueFactory(cellData -> cellData.getValue().createtimeProperty());
+			updatetimeColumn.setCellValueFactory(cellData -> cellData.getValue().updatetimeProperty());
+
+			//设置每一列的双击事件
+			RankStringCellFactory rankStringCellFactory = new RankStringCellFactory();
+			RankIntegerCellFactory rankIntegerCellFactory = new RankIntegerCellFactory();
+			RankLocalDateTimeCellFactory rankLocalDateTimeCellFactory = new RankLocalDateTimeCellFactory();
+			rankColumn.setCellFactory(rankStringCellFactory);
+			productNumColumn.setCellFactory(rankIntegerCellFactory);
+			productPriceColumn.setCellFactory(rankIntegerCellFactory);
+			productSumColumn.setCellFactory(rankIntegerCellFactory);
+			producttypeColumn.setCellFactory(rankStringCellFactory);
+			createtimeColumn.setCellFactory(rankLocalDateTimeCellFactory);
+			updatetimeColumn.setCellFactory(rankLocalDateTimeCellFactory);
 		}
-		else
+		catch (Exception e)
 		{
-			rank.setRank("");
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
-		if(!"请选择".equals(productTypeString))
+		finally
 		{
-			rank.setProducttype(productTypeString);
+			sqlSession.close();
 		}
-		else
-		{
-			rank.setProducttype("");
-		}
-		List<Rank> ranks;
-		ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRank", rank);
-		rankData.addAll(ranks);
-//		// 通过代理级别查询客户信息
-//		if (!"请选择".equals(rankString.trim())) {
-//			ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRank", rankString);
-//			rankData.addAll(ranks);
-//		} else {
-//			//如果没有查询信息，则全部查询
-//			ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getAllRank");
-//			rankData.addAll(ranks);
-//		}
-
-		//表中放数据
-		rankTable.setItems(rankData);
-
-		//设置显示过滤列的菜单按钮
-		rankTable.setTableMenuButtonVisible(true);
-
-		// 设置列中的文本居中
-		rankColumn.setStyle( "-fx-alignment: CENTER;");
-		productNumColumn.setStyle( "-fx-alignment: CENTER;");
-		productPriceColumn.setStyle( "-fx-alignment: CENTER;");
-		productSumColumn.setStyle("-fx-alignment: CENTER;");
-		producttypeColumn.setStyle("-fx-alignment: CENTER;");
-		createtimeColumn.setStyle("-fx-alignment: CENTER;");
-		updatetimeColumn.setStyle("-fx-alignment: CENTER;");
-
-		// 将数据放入表中的列
-		rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
-		productNumColumn.setCellValueFactory(cellData -> cellData.getValue().productNumProperty().asObject());
-		productPriceColumn.setCellValueFactory(cellData -> cellData.getValue().productPriceProperty().asObject());
-		productSumColumn.setCellValueFactory(cellData -> cellData.getValue().productSumProperty().asObject());
-		producttypeColumn.setCellValueFactory(cellData -> cellData.getValue().producttypeProperty());
-		createtimeColumn.setCellValueFactory(cellData -> cellData.getValue().createtimeProperty());
-		updatetimeColumn.setCellValueFactory(cellData -> cellData.getValue().updatetimeProperty());
-
-		//设置每一列的双击事件
-		RankStringCellFactory rankStringCellFactory = new RankStringCellFactory();
-		RankIntegerCellFactory rankIntegerCellFactory = new RankIntegerCellFactory();
-		RankLocalDateTimeCellFactory rankLocalDateTimeCellFactory = new RankLocalDateTimeCellFactory();
-		rankColumn.setCellFactory(rankStringCellFactory);
-		productNumColumn.setCellFactory(rankIntegerCellFactory);
-		productPriceColumn.setCellFactory(rankIntegerCellFactory);
-		productSumColumn.setCellFactory(rankIntegerCellFactory);
-		producttypeColumn.setCellFactory(rankStringCellFactory);
-		createtimeColumn.setCellFactory(rankLocalDateTimeCellFactory);
-		updatetimeColumn.setCellFactory(rankLocalDateTimeCellFactory);
 
 	}
 

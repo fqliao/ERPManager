@@ -10,7 +10,7 @@ public class MybatisUtils {
 	private static String conf = "conf.xml";
 	private static SqlSessionFactory ssf = null;
 
-	public static SqlSession getSqlSession(boolean flag){
+	public static SqlSession getSqlSession(boolean flag) throws Exception{
 		//加载mybatis的配置文件（它也加载关联的映射文件）
 		InputStream is = MybatisUtils.class.getClassLoader().getResourceAsStream(conf);
 		//构建sqlSession的工厂

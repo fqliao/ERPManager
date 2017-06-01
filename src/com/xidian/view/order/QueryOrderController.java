@@ -182,13 +182,21 @@ public class QueryOrderController {
 	private void initialize()
 	{
 		//设置默认发件人为登录用户
-		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-		List<String> reallyNames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
-		sqlSession.close();
-		if(deliveryNameBox != null)
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			List<String> reallyNames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
+			if(deliveryNameBox != null)
+			{
+				deliveryNameBox.getItems().addAll(reallyNames);
+				deliveryNameBox.getSelectionModel().select(SingletonData.getSingletonData().getManagerUser().getReallyname());
+			}
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
 		{
-			deliveryNameBox.getItems().addAll(reallyNames);
-			deliveryNameBox.getSelectionModel().select(SingletonData.getSingletonData().getManagerUser().getReallyname());
+			sqlSession.close();
 		}
 		//设置默认起始时间和结束时间
 		LocalDate now = LocalDate.now();
@@ -362,69 +370,78 @@ public class QueryOrderController {
 		}
 
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			// 通过订单号、授权号查询客户信息
+			List<Order> orders;
+			orders = sqlSession.selectList("com.xidian.model.order.OrderXml.getOrder", order);
+			orderData.addAll(orders);
+			sqlSession.close();
+			//表中放数据
+			orderTable.setItems(orderData);
 
-		// 通过订单号、授权号查询客户信息
-		List<Order> orders;
-		orders = sqlSession.selectList("com.xidian.model.order.OrderXml.getOrder", order);
-		orderData.addAll(orders);
-		sqlSession.close();
-		//表中放数据
-		orderTable.setItems(orderData);
+			//设置显示过滤列的菜单按钮
+			orderTable.setTableMenuButtonVisible(true);
 
-		//设置显示过滤列的菜单按钮
-		orderTable.setTableMenuButtonVisible(true);
+			// 设置列中的文本居中
+			orderIdColumn.setStyle( "-fx-alignment: CENTER;");
+			rankColumn.setStyle( "-fx-alignment: CENTER;");
+			auIdColumn.setStyle( "-fx-alignment: CENTER;");
+			codeColumn.setStyle( "-fx-alignment: CENTER;");
+			wayBillNumberColumn.setStyle( "-fx-alignment: CENTER;");
+			expressColumn.setStyle( "-fx-alignment: CENTER;");
+			deliveryTimeColumn.setStyle( "-fx-alignment: CENTER;");
+			deliveryNameColumn.setStyle( "-fx-alignment: CENTER;");
+			productIdColumn.setStyle( "-fx-alignment: CENTER;");
+			productNumColumn.setStyle( "-fx-alignment: CENTER;");
+			productPriceColumn.setStyle( "-fx-alignment: CENTER;");
+			productSumColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverNameColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverPhoneColumn.setStyle( "-fx-alignment: CENTER;");
+			receiverAddressColumn.setStyle( "-fx-alignment: CENTER;");
 
-		// 设置列中的文本居中
-		orderIdColumn.setStyle( "-fx-alignment: CENTER;");
-		rankColumn.setStyle( "-fx-alignment: CENTER;");
-		auIdColumn.setStyle( "-fx-alignment: CENTER;");
-		codeColumn.setStyle( "-fx-alignment: CENTER;");
-		wayBillNumberColumn.setStyle( "-fx-alignment: CENTER;");
-		expressColumn.setStyle( "-fx-alignment: CENTER;");
-		deliveryTimeColumn.setStyle( "-fx-alignment: CENTER;");
-		deliveryNameColumn.setStyle( "-fx-alignment: CENTER;");
-		productIdColumn.setStyle( "-fx-alignment: CENTER;");
-		productNumColumn.setStyle( "-fx-alignment: CENTER;");
-		productPriceColumn.setStyle( "-fx-alignment: CENTER;");
-		productSumColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverNameColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverPhoneColumn.setStyle( "-fx-alignment: CENTER;");
-		receiverAddressColumn.setStyle( "-fx-alignment: CENTER;");
+			// 将数据放入表中的列
+			orderIdColumn.setCellValueFactory(cellData -> cellData.getValue().orderIdProperty());
+			rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+			auIdColumn.setCellValueFactory(cellData -> cellData.getValue().auIdProperty());
+			codeColumn.setCellValueFactory(cellData -> cellData.getValue().codeProperty());
+			wayBillNumberColumn.setCellValueFactory(cellData -> cellData.getValue().wayBillNumberProperty());
+			expressColumn.setCellValueFactory(cellData -> cellData.getValue().expressProperty());
+			deliveryTimeColumn.setCellValueFactory(cellData -> cellData.getValue().deliveryTimeProperty());
+			deliveryNameColumn.setCellValueFactory(cellData -> cellData.getValue().deliveryNameProperty());
+			productIdColumn.setCellValueFactory(cellData -> cellData.getValue().productIdProperty());
+			productNumColumn.setCellValueFactory(cellData -> cellData.getValue().productNumProperty().asObject());
+			productPriceColumn.setCellValueFactory(cellData -> cellData.getValue().productPriceProperty().asObject());
+			productSumColumn.setCellValueFactory(cellData -> cellData.getValue().productSumProperty().asObject());
+			receiverNameColumn.setCellValueFactory(cellData -> cellData.getValue().receiverNameProperty());
+			receiverPhoneColumn.setCellValueFactory(cellData -> cellData.getValue().receiverPhoneProperty());
+			receiverAddressColumn.setCellValueFactory(cellData -> cellData.getValue().receiverAddressProperty());
 
-		// 将数据放入表中的列
-		orderIdColumn.setCellValueFactory(cellData -> cellData.getValue().orderIdProperty());
-		rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
-		auIdColumn.setCellValueFactory(cellData -> cellData.getValue().auIdProperty());
-		codeColumn.setCellValueFactory(cellData -> cellData.getValue().codeProperty());
-		wayBillNumberColumn.setCellValueFactory(cellData -> cellData.getValue().wayBillNumberProperty());
-		expressColumn.setCellValueFactory(cellData -> cellData.getValue().expressProperty());
-		deliveryTimeColumn.setCellValueFactory(cellData -> cellData.getValue().deliveryTimeProperty());
-		deliveryNameColumn.setCellValueFactory(cellData -> cellData.getValue().deliveryNameProperty());
-		productIdColumn.setCellValueFactory(cellData -> cellData.getValue().productIdProperty());
-		productNumColumn.setCellValueFactory(cellData -> cellData.getValue().productNumProperty().asObject());
-		productPriceColumn.setCellValueFactory(cellData -> cellData.getValue().productPriceProperty().asObject());
-		productSumColumn.setCellValueFactory(cellData -> cellData.getValue().productSumProperty().asObject());
-		receiverNameColumn.setCellValueFactory(cellData -> cellData.getValue().receiverNameProperty());
-		receiverPhoneColumn.setCellValueFactory(cellData -> cellData.getValue().receiverPhoneProperty());
-		receiverAddressColumn.setCellValueFactory(cellData -> cellData.getValue().receiverAddressProperty());
+			//设置每一列的双击事件
+			orderIdColumn.setCellFactory(new OrderStringCellFactory());
+			rankColumn.setCellFactory(new OrderStringCellFactory());
+			auIdColumn.setCellFactory(new OrderStringCellFactory());
+			codeColumn.setCellFactory(new OrderStringCellFactory());
+			wayBillNumberColumn.setCellFactory(new OrderStringCellFactory());
+			expressColumn.setCellFactory(new OrderStringCellFactory());
+			deliveryTimeColumn.setCellFactory(new OrderLocalDateTimeCellFactory());
+			deliveryNameColumn.setCellFactory(new OrderStringCellFactory());
+			productIdColumn.setCellFactory(new OrderStringCellFactory());
+			productNumColumn.setCellFactory(new OrderIntegerCellFactory());
+			productPriceColumn.setCellFactory(new OrderIntegerCellFactory());
+			productSumColumn.setCellFactory(new OrderIntegerCellFactory());
+			receiverNameColumn.setCellFactory(new OrderStringCellFactory());
+			receiverPhoneColumn.setCellFactory(new OrderStringCellFactory());
+			receiverAddressColumn.setCellFactory(new OrderStringCellFactory());
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
 
-		//设置每一列的双击事件
-		orderIdColumn.setCellFactory(new OrderStringCellFactory());
-		rankColumn.setCellFactory(new OrderStringCellFactory());
-		auIdColumn.setCellFactory(new OrderStringCellFactory());
-		codeColumn.setCellFactory(new OrderStringCellFactory());
-		wayBillNumberColumn.setCellFactory(new OrderStringCellFactory());
-		expressColumn.setCellFactory(new OrderStringCellFactory());
-		deliveryTimeColumn.setCellFactory(new OrderLocalDateTimeCellFactory());
-		deliveryNameColumn.setCellFactory(new OrderStringCellFactory());
-		productIdColumn.setCellFactory(new OrderStringCellFactory());
-		productNumColumn.setCellFactory(new OrderIntegerCellFactory());
-		productPriceColumn.setCellFactory(new OrderIntegerCellFactory());
-		productSumColumn.setCellFactory(new OrderIntegerCellFactory());
-		receiverNameColumn.setCellFactory(new OrderStringCellFactory());
-		receiverPhoneColumn.setCellFactory(new OrderStringCellFactory());
-		receiverAddressColumn.setCellFactory(new OrderStringCellFactory());
 
 	}
 

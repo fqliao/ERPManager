@@ -6,6 +6,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
 import com.xidian.model.system.ManagerUser;
+import com.xidian.util.MessageUtil;
 import com.xidian.util.MybatisUtils;
 
 import javafx.collections.FXCollections;
@@ -72,24 +73,31 @@ public class QueryManagerUserController {
 
 	@FXML
 	private void initialize() {
-		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-		if(usernameBox != null)
-		{
-			List<String> usernames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofUsernameName");
-			usernameBox.getItems().removeAll(usernameBox.getItems());
-//			usernameBox.getItems().add("请选择");
-			usernameBox.getItems().addAll(usernames);
-//			usernameBox.getSelectionModel().select("请选择");
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			if(usernameBox != null)
+			{
+				List<String> usernames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofUsernameName");
+				usernameBox.getItems().removeAll(usernameBox.getItems());
+				usernameBox.getItems().addAll(usernames);
+			}
+			if(reallynameBox != null)
+			{
+				List<String> reallynames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
+				reallynameBox.getItems().removeAll(reallynameBox.getItems());
+				reallynameBox.getItems().addAll(reallynames);
+			}
 		}
-		if(reallynameBox != null)
+		catch (Exception e)
 		{
-			List<String> reallynames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
-			reallynameBox.getItems().removeAll(reallynameBox.getItems());
-//			reallynameBox.getItems().add("请选择");
-			reallynameBox.getItems().addAll(reallynames);
-//			reallynameBox.getSelectionModel().select("请选择");
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
-		sqlSession.close();
+		finally
+		{
+			sqlSession.close();
+		}
+
 	}
 
 	/**定义列的点击事件类
@@ -126,73 +134,60 @@ public class QueryManagerUserController {
 		String username = usernameBox.getSelectionModel().getSelectedItem();
 		String reallyname = reallynameBox.getSelectionModel().getSelectedItem();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
 
-		List<ManagerUser> managerUsers;
-		ManagerUser user = new ManagerUser();
-		if(username == null)
-		{
-			user.setUsername("");
+			List<ManagerUser> managerUsers;
+			ManagerUser user = new ManagerUser();
+			if(username == null)
+			{
+				user.setUsername("");
+			}
+			else
+			{
+				user.setUsername("%"+username+"%");
+			}
+			if(reallyname == null)
+			{
+				user.setReallyname("");
+			}
+			else
+			{
+				user.setReallyname("%"+reallyname+"%");
+			}
+			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUsers", user);
+			managerUserData.addAll(managerUsers);
+			//表中放数据
+			managerUserTable.setItems(managerUserData);
+
+			//设置显示过滤列的菜单按钮
+			managerUserTable.setTableMenuButtonVisible(true);
+
+			// 设置列中的文本居中
+			usernameColumn.setStyle( "-fx-alignment: CENTER;");
+			reallynameColumn.setStyle( "-fx-alignment: CENTER;");
+			typeuserColumn.setStyle( "-fx-alignment: CENTER;");
+
+			// 将数据放入表中的列
+			usernameColumn.setCellValueFactory(cellData -> cellData.getValue().usernameProperty());
+			reallynameColumn.setCellValueFactory(cellData -> cellData.getValue().reallynameProperty());
+			typeuserColumn.setCellValueFactory(cellData -> cellData.getValue().typeuserProperty());
+
+			//设置每一列的双击事件
+			ManagerUserStringCellFactory managerUserStringCellFactory = new ManagerUserStringCellFactory();
+			usernameColumn.setCellFactory(managerUserStringCellFactory);
+			reallynameColumn.setCellFactory(managerUserStringCellFactory);
+			typeuserColumn.setCellFactory(managerUserStringCellFactory);
 		}
-		else
+		catch (Exception e)
 		{
-			user.setUsername("%"+username+"%");
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
-		if(reallyname == null)
+		finally
 		{
-			user.setReallyname("");
+			sqlSession.close();
 		}
-		else
-		{
-			user.setReallyname("%"+reallyname+"%");
-		}
-		managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUsers", user);
-		managerUserData.addAll(managerUsers);
-//		// 通过用户名查询用户信息
-//		if (!"".equals(username) && "".equals(reallyname))
-//		{
-//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameLike", "%"+username+"%");
-//			managerUserData.addAll(managerUsers);
-//		}
-//		// 通过姓名查询用户信息
-//		else if("".equals(username) && !"".equals(reallyname))
-//		{
-//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByReallynameLike", "%"+reallyname+"%");
-//			managerUserData.addAll(managerUsers);
-//		}
-//		else if(!"".equals(username) && !"".equals(reallyname))
-//		{
-//			ManagerUser managerUser = new ManagerUser("%"+username+"%", "%"+reallyname+"%", null, null);
-//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserByUsernameAndReallynameLike", managerUser);
-//			managerUserData.addAll(managerUsers);
-//		}
-//		else
-//		{
-//			managerUsers = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAll");
-//			managerUserData.addAll(managerUsers);
-//		}
-
-		//表中放数据
-		managerUserTable.setItems(managerUserData);
-
-		//设置显示过滤列的菜单按钮
-		managerUserTable.setTableMenuButtonVisible(true);
-
-		// 设置列中的文本居中
-		usernameColumn.setStyle( "-fx-alignment: CENTER;");
-		reallynameColumn.setStyle( "-fx-alignment: CENTER;");
-		typeuserColumn.setStyle( "-fx-alignment: CENTER;");
-
-		// 将数据放入表中的列
-		usernameColumn.setCellValueFactory(cellData -> cellData.getValue().usernameProperty());
-		reallynameColumn.setCellValueFactory(cellData -> cellData.getValue().reallynameProperty());
-		typeuserColumn.setCellValueFactory(cellData -> cellData.getValue().typeuserProperty());
-
-		//设置每一列的双击事件
-		ManagerUserStringCellFactory managerUserStringCellFactory = new ManagerUserStringCellFactory();
-		usernameColumn.setCellFactory(managerUserStringCellFactory);
-		reallynameColumn.setCellFactory(managerUserStringCellFactory);
-		typeuserColumn.setCellFactory(managerUserStringCellFactory);
 
 	}
 

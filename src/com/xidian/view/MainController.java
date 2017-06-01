@@ -153,24 +153,6 @@ public class MainController {
 	}
 
 	/**
-	 * 打开90天查询面板
-	 */
-	@FXML
-	private void handleQevaluate()
-	{
-		mainApp.showQevaluate(anchorPaneContent);
-	}
-
-	/**
-	 * 打开年度奖励查询面板
-	 */
-	@FXML
-	private void handleYevaluate()
-	{
-		mainApp.showYevaluate(anchorPaneContent);
-	}
-
-	/**
 	 * 打开余额更新查询面板
 	 */
 	@FXML

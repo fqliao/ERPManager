@@ -1,10 +1,5 @@
 package com.xidian.view.system;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
@@ -65,16 +60,28 @@ public class NewManagerUserController {
 					// 查询用户名
 					if (!"".equals(newUsername.trim()))
 					{
-						SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-						ManagerUser managerUser = sqlSession.selectOne("com.xidian.ManagerUserXml.getManagerUser", newUsername.trim());
-						if(managerUser != null)
-						{
-							usernameLabel.setText("用户名已存在！");
+						SqlSession sqlSession = null;
+						try {
+							sqlSession = MybatisUtils.getSqlSession(true);
+							ManagerUser managerUser = sqlSession.selectOne("com.xidian.ManagerUserXml.getManagerUser", newUsername.trim());
+							if(managerUser != null)
+							{
+								usernameLabel.setText("用户名已存在！");
+							}
+							else
+							{
+								usernameLabel.setText("");
+							}
 						}
-						else
+						catch (Exception e)
 						{
-							usernameLabel.setText("");
+							MessageUtil.alertInfo("请检查您是否有网络！");
 						}
+						finally
+						{
+							sqlSession.close();
+						}
+
 					}
 
 				}

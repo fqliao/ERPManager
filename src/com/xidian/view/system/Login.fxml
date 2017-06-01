@@ -40,10 +40,6 @@
             <Font size="24.0" />
          </font>
       </Label>
-      <HBox layoutX="225.0" layoutY="74.0">
-         <children>
-            <Label fx:id="messageLabel" layoutX="225.0" layoutY="74.0" text="   " />
-         </children>
-      </HBox>
+      <Label fx:id="messageLabel" layoutX="96.0" layoutY="79.0" />
    </children>
 </AnchorPane>

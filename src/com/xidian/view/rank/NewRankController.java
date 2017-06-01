@@ -47,6 +47,7 @@ public class NewRankController {
 	//
 	private MainApp mainApp;
 	private Rank rank;
+	private SqlSession sqlSession;;
 	private String patternString = "^[1-9]*[1-9][0-9]*$";
 
 	public NewRankController() {
@@ -60,85 +61,96 @@ public class NewRankController {
 	@FXML
 	private void initialize() {
 
-		SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-		List<String> productType;
-		productType = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
-		producttypeBox.getItems().addAll(productType);
-		producttypeBox.getSelectionModel().select(productType.get(0));
+		try {
+			sqlSession = MybatisUtils.getSqlSession(true);
+			List<String> productType;
+			productType = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
+			producttypeBox.getItems().addAll(productType);
+			producttypeBox.getSelectionModel().select(productType.get(0));
 
-		List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-		rankBox.getItems().removeAll(rankBox.getItems());
-		rankBox.getItems().addAll(ranks);
-		rankBox.getSelectionModel().selectFirst();
+			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+			rankBox.getItems().removeAll(rankBox.getItems());
+			rankBox.getItems().addAll(ranks);
+			rankBox.getSelectionModel().selectFirst();
 
-		sqlSession.close();
+			sqlSession.close();
 
-		if(productNumField != null)
-		{
-			//对productNum设置监听事件
-			productNumField.textProperty().addListener(new ChangeListener<String>() {
+			if(productNumField != null)
+			{
+				//对productNum设置监听事件
+				productNumField.textProperty().addListener(new ChangeListener<String>() {
 
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldNum,  String newNum) {
-					if(rank == null)
-					{
-						String num = newNum.trim();
-						if(num.matches(patternString))
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldNum,  String newNum) {
+						if(rank == null)
 						{
-							caculateSum1(num);
+							String num = newNum.trim();
+							if(num.matches(patternString))
+							{
+								caculateSum1(num);
+							}
+							else
+							{
+								MessageUtil.alertInfo("数量必须为正整数！");
+							}
 						}
-						else
-						{
-							MessageUtil.alertInfo("数量必须为正整数！");
-						}
+
 					}
 
-				}
-
-				private void caculateSum1(String num)
-				{
-					String price = productPriceField.getText().trim();
-					if(price.matches(patternString))
+					private void caculateSum1(String num)
 					{
-						productSumField.setText((Integer.parseInt(num) * Integer.parseInt(price) + ""));
-					}
-
-				}
-			});
-		}
-		if(productPriceField != null)
-		{
-			//对productNum设置监听事件
-			productPriceField.textProperty().addListener(new ChangeListener<String>() {
-
-				@Override
-				public void changed(ObservableValue<? extends String> observable, String oldPrice,  String newPrice) {
-					if(rank == null)
-					{
-						String price = newPrice.trim();
+						String price = productPriceField.getText().trim();
 						if(price.matches(patternString))
 						{
-							caculateSum2(price);
+							productSumField.setText((Integer.parseInt(num) * Integer.parseInt(price) + ""));
 						}
-						else
+
+					}
+				});
+			}
+			if(productPriceField != null)
+			{
+				//对productNum设置监听事件
+				productPriceField.textProperty().addListener(new ChangeListener<String>() {
+
+					@Override
+					public void changed(ObservableValue<? extends String> observable, String oldPrice,  String newPrice) {
+						if(rank == null)
 						{
-							MessageUtil.alertInfo("单价必须为正整数！");
+							String price = newPrice.trim();
+							if(price.matches(patternString))
+							{
+								caculateSum2(price);
+							}
+							else
+							{
+								MessageUtil.alertInfo("单价必须为正整数！");
+							}
 						}
+
 					}
 
-				}
-
-				private void caculateSum2(String price)
-				{
-					String num = productNumField.getText().trim();
-					if(num.matches(patternString))
+					private void caculateSum2(String price)
 					{
-						productSumField.setText((Integer.parseInt(price) * Integer.parseInt(num) + ""));
-					}
+						String num = productNumField.getText().trim();
+						if(num.matches(patternString))
+						{
+							productSumField.setText((Integer.parseInt(price) * Integer.parseInt(num) + ""));
+						}
 
-				}
-			});
+					}
+				});
+			}
 		}
+		catch (Exception e)
+		{
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
+
 	}
 
 	/**
@@ -161,117 +173,126 @@ public class NewRankController {
 
 
 		boolean flag = true; //用户输入是否正确标志位
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-
-		if("".equals(rankString)){
-			flag = false;
-			MessageUtil.alertInfo("请输入级别！");
-			return;
-		}
-		else{
-
-			int count = sqlSession.selectOne("com.xidian.model.rank.RankXml.getCountByProductAndRankname", rankTest);
-			if(count != 0){
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			if("".equals(rankString)){
 				flag = false;
-				MessageUtil.alertInfo("该级别存在！");
+				MessageUtil.alertInfo("请输入级别！");
 				return;
 			}
-		}
+			else{
 
-		if("".equals(productNumString)){
-			flag = false;
-			MessageUtil.alertInfo("请输入数量！");
-			return;
-		}
-		else
-		{
-			if(!productNumString.matches(patternString))
-			{
-				MessageUtil.alertInfo("数量必须为正整数！");
-				return;
+				int count = sqlSession.selectOne("com.xidian.model.rank.RankXml.getCountByProductAndRankname", rankTest);
+				if(count != 0){
+					flag = false;
+					MessageUtil.alertInfo("该级别存在！");
+					return;
+				}
 			}
-			else
-			{
-				productNum = Integer.parseInt(productNumString);
-			}
-		}
 
-		if("".equals(productPriceString)){
-			flag = false;
-			MessageUtil.alertInfo("请输入单价！");
-			return;
-		}
-		else
-		{
-			if(!productPriceString.matches(patternString))
-			{
-				MessageUtil.alertInfo("单价必须为正整数！");
+			if("".equals(productNumString)){
+				flag = false;
+				MessageUtil.alertInfo("请输入数量！");
 				return;
 			}
 			else
 			{
-				productPrice = Integer.parseInt(productPriceString);
+				if(!productNumString.matches(patternString))
+				{
+					MessageUtil.alertInfo("数量必须为正整数！");
+					return;
+				}
+				else
+				{
+					productNum = Integer.parseInt(productNumString);
+				}
 			}
-		}
 
-		if(flag)
-		{
-			rank = new Rank();
-			rank.setRank(rankString);
-			rank.setProductNum(productNum);
-			rank.setProductPrice(productPrice);
-			int productSum = productNum * productPrice;
-			rank.setProductSum(productSum);
-			LocalDateTime now = LocalDateTimeUtil.getNow();
-			rank.setCreatetime(now);
-			rank.setUpdatetime(now);
-			rank.setProducttype(producttypeString);
-
-			int addRankResult = 0;
-			String message = "";
-
-			StringBuilder messageConfirm = new StringBuilder();
-			messageConfirm.append("产品类别：" + producttypeString);
-			messageConfirm.append("\n级别：" + rankString);
-			messageConfirm.append("\n数量(元)：" + productNum);
-			messageConfirm.append("\n单价(元)：" + productPrice);
-			messageConfirm.append("\n货款(元)：" + productSum);
-			if(!MessageUtil.alertConfirm("确认级别信息", messageConfirm.toString()))
-			{
+			if("".equals(productPriceString)){
+				flag = false;
+				MessageUtil.alertInfo("请输入单价！");
 				return;
-			}
-			try
-			{
-				addRankResult = sqlSession.insert("com.xidian.model.rank.RankXml.addRank", rank);
-			}
-			catch(Exception e)
-			{
-				message = "保存失败!\n";
-				e.printStackTrace();
-			}
-			finally {
-				sqlSession.close();
-			}
-			if (addRankResult == 1)
-			{
-				message = "保存成功!";
-				SqlSession sqlSession2 = MybatisUtils.getSqlSession(true);
-				List<String> ranks = sqlSession2.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-				sqlSession2.close();
-				rankBox.getItems().removeAll(rankBox.getItems());
-				rankBox.getItems().addAll(ranks);
-				rankBox.getSelectionModel().selectFirst();
-				productNumField.setText("");
-				productPriceField.setText("");
-				productSumField.setText("");
-				rank = null;
 			}
 			else
 			{
-				message = "保存失敗!\n";
+				if(!productPriceString.matches(patternString))
+				{
+					MessageUtil.alertInfo("单价必须为正整数！");
+					return;
+				}
+				else
+				{
+					productPrice = Integer.parseInt(productPriceString);
+				}
 			}
-			MessageUtil.alertInfo(message);
+
+			if(flag)
+			{
+				rank = new Rank();
+				rank.setRank(rankString);
+				rank.setProductNum(productNum);
+				rank.setProductPrice(productPrice);
+				int productSum = productNum * productPrice;
+				rank.setProductSum(productSum);
+				LocalDateTime now = LocalDateTimeUtil.getNow();
+				rank.setCreatetime(now);
+				rank.setUpdatetime(now);
+				rank.setProducttype(producttypeString);
+
+				int addRankResult = 0;
+				String message = "";
+
+				StringBuilder messageConfirm = new StringBuilder();
+				messageConfirm.append("产品类别：" + producttypeString);
+				messageConfirm.append("\n级别：" + rankString);
+				messageConfirm.append("\n数量(元)：" + productNum);
+				messageConfirm.append("\n单价(元)：" + productPrice);
+				messageConfirm.append("\n货款(元)：" + productSum);
+				if(!MessageUtil.alertConfirm("确认级别信息", messageConfirm.toString()))
+				{
+					return;
+				}
+				try
+				{
+					addRankResult = sqlSession.insert("com.xidian.model.rank.RankXml.addRank", rank);
+				}
+				catch(Exception e)
+				{
+					message = "保存失败!\n";
+					e.printStackTrace();
+				}
+				finally {
+					sqlSession.close();
+				}
+				if (addRankResult == 1)
+				{
+					message = "保存成功!";
+					SqlSession sqlSession2 = MybatisUtils.getSqlSession(true);
+					List<String> ranks = sqlSession2.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+					sqlSession2.close();
+					rankBox.getItems().removeAll(rankBox.getItems());
+					rankBox.getItems().addAll(ranks);
+					rankBox.getSelectionModel().selectFirst();
+					productNumField.setText("");
+					productPriceField.setText("");
+					productSumField.setText("");
+					rank = null;
+				}
+				else
+				{
+					message = "保存失敗!\n";
+				}
+				MessageUtil.alertInfo(message);
+			}
+		} catch (Exception e1) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
+		finally
+		{
+			sqlSession.close();
+		}
+
 	}
 
 }

@@ -1,21 +1,14 @@
 package com.xidian.view.system;
 
-import java.time.LocalDateTime;
-
 import org.apache.ibatis.session.SqlSession;
 
 import com.xidian.MainApp;
-import com.xidian.model.rank.Rank;
 import com.xidian.model.system.ManagerUser;
 import com.xidian.util.EncryptBySaltUtil;
-import com.xidian.util.LocalDateTimeUtil;
 import com.xidian.util.MessageUtil;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;

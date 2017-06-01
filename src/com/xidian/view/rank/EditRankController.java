@@ -187,89 +187,97 @@ public class EditRankController {
 
 
 		boolean flag = true; //用户输入是否正确标志位
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-
-		if("".equals(productNumString)){
-			flag = false;
-			MessageUtil.alertInfo("请输入数量！");
-			return;
-		}
-		else
-		{
-			if(!productNumString.matches(patternString))
-			{
-				MessageUtil.alertInfo("数量必须为正整数！");
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			if("".equals(productNumString)){
+				flag = false;
+				MessageUtil.alertInfo("请输入数量！");
 				return;
 			}
 			else
 			{
-				productNum = Integer.parseInt(productNumString);
+				if(!productNumString.matches(patternString))
+				{
+					MessageUtil.alertInfo("数量必须为正整数！");
+					return;
+				}
+				else
+				{
+					productNum = Integer.parseInt(productNumString);
+				}
 			}
-		}
 
-		if("".equals(productPriceString)){
-			flag = false;
-			MessageUtil.alertInfo("请输入单价！");
-			return;
-		}
-		else
-		{
-			if(!productPriceString.matches(patternString))
-			{
-				MessageUtil.alertInfo("单价必须为正整数！");
+			if("".equals(productPriceString)){
+				flag = false;
+				MessageUtil.alertInfo("请输入单价！");
 				return;
 			}
 			else
 			{
-				productPrice = Integer.parseInt(productPriceString);
+				if(!productPriceString.matches(patternString))
+				{
+					MessageUtil.alertInfo("单价必须为正整数！");
+					return;
+				}
+				else
+				{
+					productPrice = Integer.parseInt(productPriceString);
+				}
 			}
-		}
 
-		if(flag)
+			if(flag)
+			{
+				rank.setRank(rankString);
+				rank.setProductNum(productNum);
+				rank.setProductPrice(productPrice);
+				int productSum = productNum * productPrice;
+				rank.setProductSum(productSum);
+				LocalDateTime now = LocalDateTimeUtil.getNow();
+				rank.setUpdatetime(now);
+				rank.setProducttype(productTypeString);
+
+				int updateRankResult = 0;
+				String message = "";
+
+				StringBuilder messageConfirm = new StringBuilder();
+				messageConfirm.append("级别：" + rankString);
+				messageConfirm.append("\n数量(元)：" + productNum);
+				messageConfirm.append("\n单价(元)：" + productPrice);
+				messageConfirm.append("\n货款(元)：" + productSum);
+				if(!MessageUtil.alertConfirm("确认级别信息", messageConfirm.toString()))
+				{
+					return;
+				}
+				try
+				{
+					updateRankResult = sqlSession.update("com.xidian.model.rank.RankXml.updateRank", rank);
+				}
+				catch(Exception e)
+				{
+					message = "修改失败!\n";
+				}
+				finally {
+					sqlSession.close();
+				}
+				if (updateRankResult == 1)
+				{
+					message = "修改成功!";
+				}
+				else
+				{
+					message = "修改失敗!\n";
+				}
+				MessageUtil.alertInfo(message);
+			}
+			addStage.close();
+		} catch (Exception e1) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
 		{
-			rank.setRank(rankString);
-			rank.setProductNum(productNum);
-			rank.setProductPrice(productPrice);
-			int productSum = productNum * productPrice;
-			rank.setProductSum(productSum);
-			LocalDateTime now = LocalDateTimeUtil.getNow();
-			rank.setUpdatetime(now);
-			rank.setProducttype(productTypeString);
-
-			int updateRankResult = 0;
-			String message = "";
-
-			StringBuilder messageConfirm = new StringBuilder();
-			messageConfirm.append("级别：" + rankString);
-			messageConfirm.append("\n数量(元)：" + productNum);
-			messageConfirm.append("\n单价(元)：" + productPrice);
-			messageConfirm.append("\n货款(元)：" + productSum);
-			if(!MessageUtil.alertConfirm("确认级别信息", messageConfirm.toString()))
-			{
-				return;
-			}
-			try
-			{
-				updateRankResult = sqlSession.update("com.xidian.model.rank.RankXml.updateRank", rank);
-			}
-			catch(Exception e)
-			{
-				message = "修改失败!\n";
-			}
-			finally {
-				sqlSession.close();
-			}
-			if (updateRankResult == 1)
-			{
-				message = "修改成功!";
-			}
-			else
-			{
-				message = "修改失敗!\n";
-			}
-			MessageUtil.alertInfo(message);
+			sqlSession.close();
 		}
-		addStage.close();
 
 	}
 
@@ -286,33 +294,43 @@ public class EditRankController {
 
 		String message = "";
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-		int deleteResult = 0;
-		try
-		{
-			deleteResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRank", rank);
-		}
-		catch(Exception e)
-		{
-			message = "删除失败！";
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			int deleteResult = 0;
+			try
+			{
+				deleteResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRank", rank);
+			}
+			catch(Exception e)
+			{
+				message = "删除失败！";
+			}
+			finally
+			{
+				sqlSession.close();
+			}
+
+			if(deleteResult != 0)
+			{
+				message = "删除成功！";
+				queryRankController.getRankTable().getItems().remove(rank);
+
+			}
+			else
+			{
+				message = "删除失败！";
+			}
+			MessageUtil.alertInfo(message);
+			addStage.close();
+		} catch (Exception e1) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
 		finally
 		{
 			sqlSession.close();
 		}
 
-		if(deleteResult != 0)
-		{
-			message = "删除成功！";
-			queryRankController.getRankTable().getItems().remove(rank);
-
-		}
-		else
-		{
-			message = "删除失败！";
-		}
-		MessageUtil.alertInfo(message);
-		addStage.close();
 	}
 
 }

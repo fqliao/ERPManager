@@ -125,12 +125,21 @@ public class EditCustomerController {
 		}
 		else
 		{
-			SqlSession sqlSession = MybatisUtils.getSqlSession(true);
-			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-			sqlSession.close();
+			SqlSession sqlSession = null;
+			try {
+				sqlSession = MybatisUtils.getSqlSession(true);
+				List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
+				sqlSession.close();
 
-			rankBox.getItems().addAll(ranks);
-			sexBox.getItems().addAll("男", "女");
+				rankBox.getItems().addAll(ranks);
+				sexBox.getItems().addAll("男", "女");
+			} catch (Exception e) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
+			}
+			finally
+			{
+				sqlSession.close();
+			}
 		}
 
 		auidField.setText(customer.getAuid());
@@ -239,74 +248,82 @@ public class EditCustomerController {
 
 		if (DataValicateUtil.isInputValid(customer)) {
 
-			SqlSession sqlSession = MybatisUtils.getSqlSession(false);
-
-			int result = 0;
-			String message = "";
+			SqlSession sqlSession = null;
 			try {
-				result = sqlSession.update("com.xidian.CustomerXml.updateCustomer", customer);
+				sqlSession = MybatisUtils.getSqlSession(false);
+				int result = 0;
+				String message = "";
+				try {
+					result = sqlSession.update("com.xidian.CustomerXml.updateCustomer", customer);
 
-				if(isRevoke.isSelected())
+					if(isRevoke.isSelected())
+					{
+						//更新信息变更表
+						UpdateInfo updateInfo = new UpdateInfo();
+						updateInfo.setAuid(customer.getAuid());
+						updateInfo.setState("撤销");
+						updateInfo.setRank(oldRank);
+						updateInfo.setUpdateReason("撤销");
+						LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
+						updateInfo.setUpdateTime(now);
+
+						sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+					}
+
+					if(expiredBox.isSelected())
+					{
+						//更新信息变更表
+						UpdateInfo updateInfo = new UpdateInfo();
+						updateInfo.setAuid(customer.getAuid());
+						updateInfo.setState("过期");
+						updateInfo.setRank(oldRank);
+						updateInfo.setUpdateReason("过期");
+						LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
+						updateInfo.setUpdateTime(now);
+
+						sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+					}
+					if(!selectedRank.equals(oldRank))
+					{
+						UpdateInfo updateInfo = new UpdateInfo();
+						updateInfo.setAuid(customer.getAuid());
+						updateInfo.setState("注册");
+						updateInfo.setRank(oldRank);
+						updateInfo.setUpdateReason("手动变更级别：由"+oldRank+"变为"+selectedRank);
+						LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
+						updateInfo.setUpdateTime(now);
+
+						sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+					}
+
+					sqlSession.commit();
+				}
+				catch(Exception e)
 				{
-					//更新信息变更表
-					UpdateInfo updateInfo = new UpdateInfo();
-					updateInfo.setAuid(customer.getAuid());
-					updateInfo.setState("撤销");
-					updateInfo.setRank(oldRank);
-					updateInfo.setUpdateReason("撤销");
-					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
-					updateInfo.setUpdateTime(now);
-
-					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+					e.printStackTrace();
+					message = "修改失败！";
+				}
+				finally{
+					sqlSession.close();
 				}
 
-				if(expiredBox.isSelected())
+				if (result == 1)// 修改成功
 				{
-					//更新信息变更表
-					UpdateInfo updateInfo = new UpdateInfo();
-					updateInfo.setAuid(customer.getAuid());
-					updateInfo.setState("过期");
-					updateInfo.setRank(oldRank);
-					updateInfo.setUpdateReason("过期");
-					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
-					updateInfo.setUpdateTime(now);
-
-					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+					message = "修改成功！";
 				}
-				if(!selectedRank.equals(oldRank))
-				{
-					UpdateInfo updateInfo = new UpdateInfo();
-					updateInfo.setAuid(customer.getAuid());
-					updateInfo.setState("注册");
-					updateInfo.setRank(oldRank);
-					updateInfo.setUpdateReason("手动变更级别：由"+oldRank+"变为"+selectedRank);
-					LocalDateTime now = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
-					updateInfo.setUpdateTime(now);
-
-					sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
+				else {
+					message = "修改失败！";
 				}
+				MessageUtil.alertInfo(message);
 
-				sqlSession.commit();
+				editStage.close();// 关闭修改客户信息界面
+			} catch (Exception e1) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
 			}
-			catch(Exception e)
+			finally
 			{
-				e.printStackTrace();
-				message = "修改失败！";
-			}
-			finally{
 				sqlSession.close();
 			}
-
-			if (result == 1)// 修改成功
-			{
-				message = "修改成功！";
-			}
-			else {
-				message = "修改失败！";
-			}
-			MessageUtil.alertInfo(message);
-
-			editStage.close();// 关闭修改客户信息界面
 
 		}
 	}

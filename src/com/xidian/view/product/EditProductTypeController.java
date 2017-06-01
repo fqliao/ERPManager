@@ -74,29 +74,39 @@ public class EditProductTypeController {
 		// 清空表中的数据
 		productTable.getItems().clear();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			List<Product> products;
 
-		List<Product> products;
+			products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
 
-		products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
+			productData.addAll(products);
 
-		productData.addAll(products);
+			//表中放数据
+			productTable.setItems(productData);
 
-		//表中放数据
-		productTable.setItems(productData);
+			//设置显示过滤列的菜单按钮
+			productTable.setTableMenuButtonVisible(true);
 
-		//设置显示过滤列的菜单按钮
-		productTable.setTableMenuButtonVisible(true);
+			// 设置列中的文本居中
+			producttypeColumn.setStyle( "-fx-alignment: CENTER;");
 
-		// 设置列中的文本居中
-		producttypeColumn.setStyle( "-fx-alignment: CENTER;");
+			// 将数据放入表中的列
+			producttypeColumn.setCellValueFactory(cellData -> cellData.getValue().producttypeProperty());
 
-		// 将数据放入表中的列
-		producttypeColumn.setCellValueFactory(cellData -> cellData.getValue().producttypeProperty());
+			//设置每一列的双击事件
+			productStringCellFactory productStringCellFactory = new productStringCellFactory();
+			producttypeColumn.setCellFactory(productStringCellFactory);
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
 
-		//设置每一列的双击事件
-		productStringCellFactory productStringCellFactory = new productStringCellFactory();
-		producttypeColumn.setCellFactory(productStringCellFactory);
+
 	}
 	/**
 	 * 定义列的点击事件
@@ -138,27 +148,37 @@ public class EditProductTypeController {
 	}
 
 	//检测产品名是否重复
-	SqlSession sqlSession = mainApp.getSqlSession(true);
-	List<Product> products;
-	boolean flag = true;
-	products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
-	for(Product eachProduct : products){
-		if(eachProduct.getProducttype().equals(newProduct.trim())){
-			flag = false;
+	SqlSession sqlSession = null;
+	try {
+		sqlSession = mainApp.getSqlSession(true);
+		List<Product> products;
+		boolean flag = true;
+		products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
+		for(Product eachProduct : products){
+			if(eachProduct.getProducttype().equals(newProduct.trim())){
+				flag = false;
+			}
 		}
+		if(!flag){
+			MessageUtil.alertInfo("该产品名已经存在！");
+			return;
+		}
+
+		//增加新的产品
+		int addProductResult = sqlSession.insert("com.xidian.model.product.ProductXml.addProductType",newProduct);
+	    if(addProductResult == 1){
+	       MessageUtil.alertInfo("保存成功！");
+	       editProductTypeController.setData();
+	       editStage.close();
+	    }
+	} catch (Exception e) {
+		MessageUtil.alertInfo("请检查您是否有网络！");
 	}
-	if(!flag){
-		MessageUtil.alertInfo("该产品名已经存在！");
-		return;
+	finally
+	{
+		sqlSession.close();
 	}
 
-	//增加新的产品
-	int addProductResult = sqlSession.insert("com.xidian.model.product.ProductXml.addProductType",newProduct);
-    if(addProductResult == 1){
-       MessageUtil.alertInfo("保存成功！");
-       editProductTypeController.setData();
-       editStage.close();
-    }
 	}
 
 }

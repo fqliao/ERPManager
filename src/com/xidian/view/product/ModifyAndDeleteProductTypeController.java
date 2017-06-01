@@ -74,38 +74,46 @@ public class ModifyAndDeleteProductTypeController {
 		}
 
 		//检测产品名是否重复
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-		List<Product> products;
-		boolean flag = true;
-		products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
-		for(Product eachProduct : products){
-			if(eachProduct.getProducttype().equals(modifyProduct.trim())&&!prodectSelect.getProducttype().equals(modifyProduct.trim())){
-				flag = false;
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			List<Product> products;
+			boolean flag = true;
+			products = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductAll");
+			for(Product eachProduct : products){
+				if(eachProduct.getProducttype().equals(modifyProduct.trim())&&!prodectSelect.getProducttype().equals(modifyProduct.trim())){
+					flag = false;
+				}
 			}
+			if(!flag){
+				MessageUtil.alertInfo("该产品名已经存在！");
+				return;
+			}
+
+			//修改产品名
+			prodectSelect.setOldproducttype(prodectSelect.getProducttype());
+			prodectSelect.setProducttype(modifyProduct);
+			int modifyProductResult = sqlSession.update("com.xidian.model.product.ProductXml.updateProductType",prodectSelect);
+
+			//修改相关的代理等级
+			int modifyRankResult = sqlSession.update("com.xidian.model.rank.RankXml.updateRankByProduct",prodectSelect);
+
+			if(modifyProductResult == 1){
+		       MessageUtil.alertInfo("修改成功！");
+//		       editProductTypeController.setData();
+		       editStage.close();
+		    }
+		    else{
+		    	MessageUtil.alertInfo("修改失败！");
+		    	editStage.close();
+		    }
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
-		if(!flag){
-			MessageUtil.alertInfo("该产品名已经存在！");
-			return;
+		finally
+		{
+			sqlSession.close();
 		}
-
-		//修改产品名
-		prodectSelect.setOldproducttype(prodectSelect.getProducttype());
-		prodectSelect.setProducttype(modifyProduct);
-		int modifyProductResult = sqlSession.update("com.xidian.model.product.ProductXml.updateProductType",prodectSelect);
-
-		//修改相关的代理等级
-		int modifyRankResult = sqlSession.update("com.xidian.model.rank.RankXml.updateRankByProduct",prodectSelect);
-
-		if(modifyProductResult == 1){
-	       MessageUtil.alertInfo("修改成功！");
-//	       editProductTypeController.setData();
-	       editStage.close();
-	    }
-	    else{
-	    	MessageUtil.alertInfo("修改失败！");
-	    	editStage.close();
-	    }
-
 
 	}
 
@@ -114,21 +122,31 @@ public class ModifyAndDeleteProductTypeController {
 	 */
 	@FXML
 	private void deleteProduct(){
-		SqlSession sqlSession = mainApp.getSqlSession(true);
-		int deleteProductResult = sqlSession.delete("com.xidian.model.product.ProductXml.deleteProductType",prodectSelect);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			int deleteProductResult = sqlSession.delete("com.xidian.model.product.ProductXml.deleteProductType",prodectSelect);
 
-		//删除相关的代理等级
-		int deleteRankResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRankByProduct",prodectSelect);
+			//删除相关的代理等级
+			int deleteRankResult = sqlSession.delete("com.xidian.model.rank.RankXml.deleteRankByProduct",prodectSelect);
 
-		if(deleteProductResult == 1){
-	       MessageUtil.alertInfo("删除成功！");
-	       editProductTypeController.setData();
-	       editStage.close();
-	    }
-	    else{
-	    	MessageUtil.alertInfo("删除失败！");
-	    	editStage.close();
-	    }
+			if(deleteProductResult == 1){
+		       MessageUtil.alertInfo("删除成功！");
+		       editProductTypeController.setData();
+		       editStage.close();
+		    }
+		    else{
+		    	MessageUtil.alertInfo("删除失败！");
+		    	editStage.close();
+		    }
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
+		}
+		finally
+		{
+			sqlSession.close();
+		}
+
 	}
 
 }

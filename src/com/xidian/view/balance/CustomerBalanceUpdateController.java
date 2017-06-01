@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import com.xidian.MainApp;
 import com.xidian.model.balance.UpdateBalance;
 import com.xidian.util.LocalDateTimeUtil;
+import com.xidian.util.MessageUtil;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -222,76 +223,84 @@ public class CustomerBalanceUpdateController {
 		String name = nameField.getText();
 		String rank = rankBox.getSelectionModel().getSelectedItem();
 
-		SqlSession sqlSession = mainApp.getSqlSession(true);
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = mainApp.getSqlSession(true);
+			// 通过授权号、姓名、代理类型查询余额更新信息
+			if (!"".equals(auId.trim())) {
+				List<UpdateBalance> balanceByAuid = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByAuid", "%"+auId+"%");
+				UpdateBalanceData.addAll(balanceByAuid);
+			} else {
+				// 如果没有授权号、级别，则查询姓名
+				if (!"".equals(name.trim())&&"请选择".equals(rank.trim())) {
+					List<UpdateBalance> balanceByName = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByName", "%"+name+"%");
+					UpdateBalanceData.addAll(balanceByName);
+				}
+				else{
+				// 如果授权号、姓名都没有，则查询级别
+				if (!"请选择".equals(rank.trim())&& "".equals(name.trim())) {
+					List<UpdateBalance> balanceByRank = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByRank",rank);
+					UpdateBalanceData.addAll(balanceByRank);
+				}
+				//如果授权号、姓名、级别都没有，则查询全部
+				if ("请选择".equals(rank.trim())&& "".equals(name.trim())) {
+					List<UpdateBalance> balanceByAll = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByAll");
+					UpdateBalanceData.addAll(balanceByAll);
+				}
+				//姓名、级别组合查询
+				if(!"请选择".equals(rank.trim())&& !"".equals(name.trim())){
+					UpdateBalance queryUpdateBalance = new UpdateBalance();
+					queryUpdateBalance.setCustomerName("%"+name+"%");
+					queryUpdateBalance.setRank(rank);
+					List<UpdateBalance> balanceByNameAndRank = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByNameAndRank",queryUpdateBalance);
+					UpdateBalanceData.addAll(balanceByNameAndRank);
+				}
 
-		// 通过授权号、姓名、代理类型查询余额更新信息
-		if (!"".equals(auId.trim())) {
-			List<UpdateBalance> balanceByAuid = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByAuid", "%"+auId+"%");
-			UpdateBalanceData.addAll(balanceByAuid);
-		} else {
-			// 如果没有授权号、级别，则查询姓名
-			if (!"".equals(name.trim())&&"请选择".equals(rank.trim())) {
-				List<UpdateBalance> balanceByName = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByName", "%"+name+"%");
-				UpdateBalanceData.addAll(balanceByName);
 			}
-			else{
-			// 如果授权号、姓名都没有，则查询级别
-			if (!"请选择".equals(rank.trim())&& "".equals(name.trim())) {
-				List<UpdateBalance> balanceByRank = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByRank",rank);
-				UpdateBalanceData.addAll(balanceByRank);
-			}
-			//如果授权号、姓名、级别都没有，则查询全部
-			if ("请选择".equals(rank.trim())&& "".equals(name.trim())) {
-				List<UpdateBalance> balanceByAll = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByAll");
-				UpdateBalanceData.addAll(balanceByAll);
-			}
-			//姓名、级别组合查询
-			if(!"请选择".equals(rank.trim())&& !"".equals(name.trim())){
-				UpdateBalance queryUpdateBalance = new UpdateBalance();
-				queryUpdateBalance.setCustomerName("%"+name+"%");
-				queryUpdateBalance.setRank(rank);
-				List<UpdateBalance> balanceByNameAndRank = sqlSession.selectList("com.xidian.UpdateBalanceXml.getBalanceByNameAndRank",queryUpdateBalance);
-				UpdateBalanceData.addAll(balanceByNameAndRank);
 			}
 
+			//表中放数据
+			balanceTable.setItems(UpdateBalanceData);
+
+			//设置显示过滤列的菜单按钮
+			balanceTable.setTableMenuButtonVisible(true);
+
+			// 设置列中的文本居中
+			nameColumn.setStyle( "-fx-alignment: CENTER;");
+			rankColumn.setStyle( "-fx-alignment: CENTER;");
+			auIdColumn.setStyle( "-fx-alignment: CENTER;");
+			updateTimeColumn.setStyle( "-fx-alignment: CENTER;");
+			preBalanceColumn.setStyle( "-fx-alignment: CENTER;");
+			updateBalanceColumn.setStyle( "-fx-alignment: CENTER;");
+			posBalanceColumn.setStyle( "-fx-alignment: CENTER;");
+			updateReasonColumn.setStyle( "-fx-alignment: CENTER;");
+
+			// 将数据放入表中的列
+			nameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
+			rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+			auIdColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
+			updateTimeColumn.setCellValueFactory(cellData -> cellData.getValue().updateTimeProperty());
+			preBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().preBalanceProperty().asObject());
+			updateBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().updateBalanceProperty().asObject());
+			posBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().posBalanceProperty().asObject());
+			updateReasonColumn.setCellValueFactory(cellData -> cellData.getValue().updateReasonProperty());
+
+			//设置每一列的双击事件
+			nameColumn.setCellFactory(new balanceStringCellFactory());
+			rankColumn.setCellFactory(new balanceStringCellFactory());
+			auIdColumn.setCellFactory(new balanceStringCellFactory());
+			updateTimeColumn.setCellFactory(new balanceLocalDateCellFactory());
+			preBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
+			updateBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
+			posBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
+			updateReasonColumn.setCellFactory(new balanceStringCellFactory());
+		} catch (Exception e) {
+			MessageUtil.alertInfo("请检查您是否有网络！");
 		}
+		finally
+		{
+			sqlSession.close();
 		}
-
-		//表中放数据
-		balanceTable.setItems(UpdateBalanceData);
-
-		//设置显示过滤列的菜单按钮
-		balanceTable.setTableMenuButtonVisible(true);
-
-		// 设置列中的文本居中
-		nameColumn.setStyle( "-fx-alignment: CENTER;");
-		rankColumn.setStyle( "-fx-alignment: CENTER;");
-		auIdColumn.setStyle( "-fx-alignment: CENTER;");
-		updateTimeColumn.setStyle( "-fx-alignment: CENTER;");
-		preBalanceColumn.setStyle( "-fx-alignment: CENTER;");
-		updateBalanceColumn.setStyle( "-fx-alignment: CENTER;");
-		posBalanceColumn.setStyle( "-fx-alignment: CENTER;");
-		updateReasonColumn.setStyle( "-fx-alignment: CENTER;");
-
-		// 将数据放入表中的列
-		nameColumn.setCellValueFactory(cellData -> cellData.getValue().customerNameProperty());
-		rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
-		auIdColumn.setCellValueFactory(cellData -> cellData.getValue().auidProperty());
-		updateTimeColumn.setCellValueFactory(cellData -> cellData.getValue().updateTimeProperty());
-		preBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().preBalanceProperty().asObject());
-		updateBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().updateBalanceProperty().asObject());
-		posBalanceColumn.setCellValueFactory(cellData -> cellData.getValue().posBalanceProperty().asObject());
-		updateReasonColumn.setCellValueFactory(cellData -> cellData.getValue().updateReasonProperty());
-
-		//设置每一列的双击事件
-		nameColumn.setCellFactory(new balanceStringCellFactory());
-		rankColumn.setCellFactory(new balanceStringCellFactory());
-		auIdColumn.setCellFactory(new balanceStringCellFactory());
-		updateTimeColumn.setCellFactory(new balanceLocalDateCellFactory());
-		preBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
-		updateBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
-		posBalanceColumn.setCellFactory(new balanceIntegerCellFactory());
-		updateReasonColumn.setCellFactory(new balanceStringCellFactory());
 	}
 
 	/**

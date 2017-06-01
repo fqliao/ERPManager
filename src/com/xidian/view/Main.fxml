@@ -81,7 +81,7 @@
                           <content>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                  <children>
-                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlePasswordChange" prefHeight="23.0" prefWidth="176.0" text="密码修改" />
+                                    <Button layoutX="-7.0" layoutY="3.0" mnemonicParsing="false" onAction="#handlePasswordChange" prefHeight="23.0" prefWidth="176.0" text="修改密码" />
                                     <Button fx:id="newManagerUserButton" layoutX="-7.0" layoutY="27.0" mnemonicParsing="false" onAction="#handleNewManagerUser" prefHeight="23.0" prefWidth="176.0" text="注册用户" />
                                     <Button fx:id="queryAndEditManagerUserButton" layoutX="-7.0" layoutY="51.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefHeight="23.0" prefWidth="176.0" text="查询修改用户" />
                                     <Button fx:id="restoreButton" layoutX="-7.0" layoutY="75.0" mnemonicParsing="false" onAction="#handleRestoreDB" prefHeight="23.0" prefWidth="176.0" text="恢复数据库" />

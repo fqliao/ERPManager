@@ -69,12 +69,20 @@ public class NewAddressController {
 			message += "请输入授权号！\n";
 		}
 		else{
-			SqlSession sqlSession = mainApp.getSqlSession(true);
-			Customer customerByAuid = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", auid);
-			if(customerByAuid == null){
-				flag = false;
-				message += "该授权号不存在！\n";
-
+			SqlSession sqlSession = null;
+			try {
+				sqlSession = mainApp.getSqlSession(true);
+				Customer customerByAuid = sqlSession.selectOne("com.xidian.CustomerXml.getCustomerByAuid", auid);
+				if(customerByAuid == null){
+					flag = false;
+					message += "该授权号不存在！\n";
+				}
+			} catch (Exception e) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
+			}
+			finally
+			{
+				sqlSession.close();
 			}
 		}
 
@@ -110,14 +118,10 @@ public class NewAddressController {
 			address.setReceiverAddress(receiverAddressField.getText());
 			address.setReceiverPhone(phone);
 
-			SqlSession sqlSession = mainApp.getSqlSession(true);// 非自动提交，可用于事务
-
-			int addAddressResult = 0;
-
+			SqlSession sqlSession =null;
 			try {
-				addAddressResult = sqlSession.insert("com.xidian.model.address.AddressXml.addAddress", address);
-			} finally {
-				sqlSession.close();
+				sqlSession = mainApp.getSqlSession(true);
+				int addAddressResult = sqlSession.insert("com.xidian.model.address.AddressXml.addAddress", address);
 				if (addAddressResult == 1) {
 					message += "保存成功!\n";
 					auidField.setText("");
@@ -127,10 +131,17 @@ public class NewAddressController {
 				} else {
 					message += "保存失敗!\n";
 				}
+
+			} catch (Exception e) {
+				MessageUtil.alertInfo("请检查您是否有网络！");
 			}
+			finally
+			{
+				sqlSession.close();
+			}
+
 		}
 		MessageUtil.alertInfo(message);
-
 	}
 
 }

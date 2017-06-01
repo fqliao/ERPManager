@@ -38,8 +38,6 @@ import com.xidian.view.balance.CustomerBalanceUpdateController;
 import com.xidian.view.customer.EditCustomerController;
 import com.xidian.view.customer.NewCustomerController;
 import com.xidian.view.customer.QueryCustomerController;
-import com.xidian.view.evaluate.QuarterEvaluateController;
-import com.xidian.view.evaluate.YearRewardController;
 import com.xidian.view.order.NewOrderController;
 import com.xidian.view.order.QueryOrderController;
 import com.xidian.view.product.EditProductTypeController;
@@ -85,7 +83,7 @@ public class MainApp extends Application {
 		launch(args);
 	}
 
-	public SqlSession getSqlSession(boolean flag)
+	public SqlSession getSqlSession(boolean flag) throws Exception
 	{
 		return MybatisUtils.getSqlSession(flag);
 	}
@@ -164,7 +162,7 @@ public class MainApp extends Application {
 	    			   path.contains(now.minusDays(1).toString())||
 	    			   path.contains(now.minusDays(2).toString())))
 	    			{
-	    				System.out.println(deleteFile(path));;
+
 	    			}
 	    		}
 	    	}
@@ -653,176 +651,6 @@ public class MainApp extends Application {
 
 	}
 
-	/**显示90天考核界面
-	 * @param anchorPaneContent
-	 */
-	public void showQevaluate(AnchorPane anchorPaneContent) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/QuarterEvaluate.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			mainStage.setMaximized(true);
-			//先移除面板中的内容
-			anchorPaneContent.getChildren().removeAll(anchorPaneContent.getChildren());
-			//增加新建客户面板
-			anchorPaneContent.getChildren().add(page);
-
-			QuarterEvaluateController qevaluateController = loader.getController();
-			qevaluateController.setMainApp(this);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	/**显示单个90天未考核信息界面
-	 * @param qevaluateTime
-	 */
-	public void showSelectQevaluate(QEvaluateTime qevaluateTime) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/QuarterEvaluateWindow.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			Stage editStage = new Stage();
-			editStage.setTitle("90天未考核信息");
-			editStage.initModality(Modality.WINDOW_MODAL);
-			editStage.initOwner(mainStage);
-			editStage.getIcons().add(new Image("file:resources/images/person.png"));
-			Scene scene = new Scene(page);
-			editStage.setScene(scene);
-
-			QuarterEvaluateController qevaluateController = loader.getController();
-			qevaluateController.setMainApp(this);
-			qevaluateController.setQevaluate(qevaluateTime);
-			qevaluateController.setEditStage(editStage);
-
-			editStage.showAndWait();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**显示单个90天已考核信息界面
-	 * @param qevaluateTime
-	 */
-	public void showSelectFinishQevaluate(QEvaluateTime qevaluateTime) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/FinishedQuarterEvaluateWindow.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			Stage editStage = new Stage();
-			editStage.setTitle("90天已考核信息");
-			editStage.initModality(Modality.WINDOW_MODAL);
-			editStage.initOwner(mainStage);
-			editStage.getIcons().add(new Image("file:resources/images/person.png"));
-			Scene scene = new Scene(page);
-			editStage.setScene(scene);
-
-			QuarterEvaluateController qevaluateController = loader.getController();
-			qevaluateController.setMainApp(this);
-			qevaluateController.setFQevaluate(qevaluateTime);
-			qevaluateController.setEditStage(editStage);
-
-			editStage.showAndWait();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-
-	/**显示年度奖励界面
-	 * @param anchorPaneContent
-	 */
-	public void showYevaluate(AnchorPane anchorPaneContent) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/YearReward.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			mainStage.setMaximized(true);
-			//先移除面板中的内容
-			anchorPaneContent.getChildren().removeAll(anchorPaneContent.getChildren());
-			//增加新建客户面板
-			anchorPaneContent.getChildren().add(page);
-
-			YearRewardController yevaluateController = loader.getController();
-			yevaluateController.setMainApp(this);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	/**显示单个年度未奖励信息界面
-	 * @param yevaluateTime
-	 */
-	public void showSelectYevaluate(YEvaluateTime yevaluateTime) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/YearRewardWindow.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			Stage editStage = new Stage();
-			editStage.setTitle("年度未奖励信息");
-			editStage.initModality(Modality.WINDOW_MODAL);
-			editStage.initOwner(mainStage);
-			editStage.getIcons().add(new Image("file:resources/images/person.png"));
-			Scene scene = new Scene(page);
-			editStage.setScene(scene);
-
-			YearRewardController yevaluateController = loader.getController();
-			yevaluateController.setMainApp(this);
-			yevaluateController.setYevaluate(yevaluateTime);
-			yevaluateController.setEditStage(editStage);
-
-			editStage.showAndWait();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
-	/**显示单个年度已奖励信息界面
-	 * @param yevaluateTime
-	 */
-	public void showSelectFYevaluate(YEvaluateTime yevaluateTime) {
-		try
-		{
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(MainApp.class.getResource("view/evaluate/FinishedYearRewardWindow.fxml"));
-			AnchorPane page = (AnchorPane)loader.load();
-
-			Stage editStage = new Stage();
-			editStage.setTitle("年度已奖励信息");
-			editStage.initModality(Modality.WINDOW_MODAL);
-			editStage.initOwner(mainStage);
-			editStage.getIcons().add(new Image("file:resources/images/person.png"));
-			Scene scene = new Scene(page);
-			editStage.setScene(scene);
-
-			YearRewardController yevaluateController = loader.getController();
-			yevaluateController.setMainApp(this);
-			yevaluateController.setFYevaluate(yevaluateTime);
-			yevaluateController.setEditStage(editStage);
-
-			editStage.showAndWait();
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-		}
-
-	}
 	/**显示余额更新界面
 	 * @param anchorPaneContent
 	 */
