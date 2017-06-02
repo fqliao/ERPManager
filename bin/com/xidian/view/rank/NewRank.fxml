@@ -34,7 +34,7 @@
                   <TextField fx:id="productSumField" editable="false" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
                   <Label text="产品类型" />
                   <ComboBox fx:id="producttypeBox" prefHeight="25.0" prefWidth="120.0" GridPane.columnIndex="1" />
-                  <ComboBox fx:id="rankBox" editable="true" prefHeight="25.0" prefWidth="120.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <TextField fx:id="rankBox" prefHeight="30.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                </children>
             </GridPane>
             <Button layoutX="179.0" layoutY="278.0" mnemonicParsing="false" onAction="#handleSaveRank" prefHeight="24.0" prefWidth="102.0" text="保存" />

@@ -104,18 +104,25 @@ public class MainApp extends Application {
 
 	 public static void timerBackupDB()
 	    {
-	        Runnable runnable = new Runnable() {
-	            public void run() {
-	                try {
-						backupDB();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-	            }
-	        };
-	        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-	        // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
-	        service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.DAYS);
+		    try {
+				backupDB();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+//	        Runnable runnable = new Runnable() {
+//	            public void run() {
+//	                try {
+//						backupDB();
+//					} catch (Exception e) {
+//						e.printStackTrace();
+//					}
+//	            }
+//	        };
+//	        ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
+//	        // 第二个参数为首次执行的延时时间，第三个参数为定时执行的间隔时间
+//	        service.scheduleAtFixedRate(runnable, 0, 1, TimeUnit.DAYS);
 	    }
 
 	    public static void backupDB() throws IOException, InterruptedException{
@@ -136,7 +143,6 @@ public class MainApp extends Application {
 
 			deleteThreeDaysAgoFile(BACKUP_DIR); //删除前三条的备份数据
 
-//	      String savePath = BACKUP_DIR + "manager-backup-" + LocalDateTimeUtil.format(LocalDateTimeUtil.getNow()) + ".sql";
 	      String savePath = BACKUP_DIR + "manager-backup-" + LocalDate.now().toString() + ".sql";
 	      String[] execCMD = new String[] {"mysqldump", "-h" + HOSTNAME, "-u" + DB_USER, "-p" + DB_PWD, DB_NAME,
 	              "-r" + savePath, "--skip-lock-tables"};

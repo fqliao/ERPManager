@@ -155,10 +155,14 @@ public class ConfirmPasswordController{
 								message = "恢复数据库成功！";
 
 							}
+							else if(result == 100)
+							{
+								message = "前一天备份文件不存在，请选择备份文件！";
+							}
 							else
 							{
 								message = "恢复数据库失败！";
-							};
+							}
 
 							return message;
 						}
@@ -194,6 +198,11 @@ public class ConfirmPasswordController{
     	if(!"".equals(sqlFileField.getText()))
     	{
     		targetFile = sqlFileField.getText();
+    	}
+    	File file = new File(targetFile);
+    	if(!file.exists())
+    	{
+    		return 100;
     	}
         String str= "mysql -h " + HOSTNAME +" -u" + DB_USER+" -p" + DB_PWD+" "+DB_NAME +" < "+targetFile;;	//将 mysql命令的语句赋值给str
         Process process = Runtime.getRuntime().exec("cmd /c"+str);//调用exce()函数

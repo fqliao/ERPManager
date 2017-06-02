@@ -1,5 +1,6 @@
 package com.xidian.view.system;
 
+
 import java.util.List;
 
 import org.apache.ibatis.session.SqlSession;
@@ -16,6 +17,7 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -28,10 +30,10 @@ import javafx.util.Callback;
 public class QueryManagerUserController {
 
 	@FXML
-	private ComboBox<String> usernameBox;
+	private TextField usernameBox;
 
 	@FXML
-	private ComboBox<String> reallynameBox;
+	private TextField reallynameBox;
 
 	@FXML
 	private TableView<ManagerUser> managerUserTable;
@@ -76,18 +78,6 @@ public class QueryManagerUserController {
 		SqlSession sqlSession = null;
 		try {
 			sqlSession = MybatisUtils.getSqlSession(true);
-			if(usernameBox != null)
-			{
-				List<String> usernames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofUsernameName");
-				usernameBox.getItems().removeAll(usernameBox.getItems());
-				usernameBox.getItems().addAll(usernames);
-			}
-			if(reallynameBox != null)
-			{
-				List<String> reallynames = sqlSession.selectList("com.xidian.ManagerUserXml.getManagerUserAllofReallyName");
-				reallynameBox.getItems().removeAll(reallynameBox.getItems());
-				reallynameBox.getItems().addAll(reallynames);
-			}
 		}
 		catch (Exception e)
 		{
@@ -131,8 +121,8 @@ public class QueryManagerUserController {
 		// 清空表中的数据
 		managerUserTable.getItems().clear();
 
-		String username = usernameBox.getSelectionModel().getSelectedItem();
-		String reallyname = reallynameBox.getSelectionModel().getSelectedItem();
+		String username = usernameBox.getText();
+		String reallyname = reallynameBox.getText();
 
 		SqlSession sqlSession = null;
 		try {

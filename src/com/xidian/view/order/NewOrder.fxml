@@ -69,7 +69,10 @@
                </GridPane.margin>
             </Label>
             <Label text="快递公司" GridPane.rowIndex="12" />
-            <ComboBox fx:id="expressBox" editable="true" prefHeight="24.0" prefWidth="95.0" promptText="选择或输入" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+            <TextField fx:id="expressBox" editable="true" prefHeight="24.0" prefWidth="95.0" promptText="输入快递公司" GridPane.columnIndex="1" GridPane.rowIndex="12">
+               <GridPane.margin>
+                  <Insets right="220.0" />
+               </GridPane.margin></TextField>
             <Button mnemonicParsing="false" onAction="#addExpress" text="+" GridPane.columnIndex="1" GridPane.rowIndex="12">
                <GridPane.margin>
                   <Insets left="100.0" />

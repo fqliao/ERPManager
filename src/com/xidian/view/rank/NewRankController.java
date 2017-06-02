@@ -28,7 +28,7 @@ import javafx.scene.control.Label;
 public class NewRankController {
 
 	@FXML
-	private ComboBox<String> rankBox;
+	private TextField rankBox;
 
 	@FXML
 	private TextField productNumField;
@@ -67,11 +67,6 @@ public class NewRankController {
 			productType = sqlSession.selectList("com.xidian.model.product.ProductXml.getProductNameAll");
 			producttypeBox.getItems().addAll(productType);
 			producttypeBox.getSelectionModel().select(productType.get(0));
-
-			List<String> ranks = sqlSession.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
-			rankBox.getItems().removeAll(rankBox.getItems());
-			rankBox.getItems().addAll(ranks);
-			rankBox.getSelectionModel().selectFirst();
 
 			sqlSession.close();
 
@@ -159,7 +154,7 @@ public class NewRankController {
 	@FXML
 	private void handleSaveRank() {
 
-		String rankString = rankBox.getSelectionModel().getSelectedItem().trim();
+		String rankString = rankBox.getText().trim();
 		String productNumString = productNumField.getText().trim();
 		String productPriceString =productPriceField.getText().trim();
 		String producttypeString = producttypeBox.getSelectionModel().getSelectedItem();
@@ -271,9 +266,7 @@ public class NewRankController {
 					SqlSession sqlSession2 = MybatisUtils.getSqlSession(true);
 					List<String> ranks = sqlSession2.selectList("com.xidian.model.rank.RankXml.getRankOfRank");
 					sqlSession2.close();
-					rankBox.getItems().removeAll(rankBox.getItems());
-					rankBox.getItems().addAll(ranks);
-					rankBox.getSelectionModel().selectFirst();
+					rankBox.setText("");
 					productNumField.setText("");
 					productPriceField.setText("");
 					productSumField.setText("");

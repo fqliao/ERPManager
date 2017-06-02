@@ -21,7 +21,7 @@
       <Label layoutX="515.0" layoutY="18.0" text="用户名" />
       <Label layoutX="528.0" layoutY="51.0" text="姓名" />
       <Button layoutX="588.0" layoutY="81.0" mnemonicParsing="false" onAction="#handleQueryManagerUser" prefWidth="100.0" text="查询" />
-      <ComboBox fx:id="usernameBox" editable="true" layoutX="561.0" layoutY="14.0" prefWidth="150.0" />
-      <ComboBox fx:id="reallynameBox" editable="true" layoutX="561.0" layoutY="47.0" prefWidth="150.0" />
+      <TextField fx:id="usernameBox" layoutX="561.0" layoutY="14.0" />
+      <TextField fx:id="reallynameBox" layoutX="561.0" layoutY="47.0" />
    </children>
 </AnchorPane>

@@ -85,7 +85,7 @@ public class NewOrderController {
 	private ComboBox<String> productPriceBox;
 
 	@FXML
-	private ComboBox<String> expressBox;
+	private TextField expressBox;
 
 	@FXML
 	private ComboBox<String> selectedExpressBox;
@@ -166,13 +166,6 @@ public class NewOrderController {
 			productIdBox.getItems().removeAll(productIdBox.getItems());
 			productIdBox.getItems().addAll("药王茶");
 			productIdBox.getSelectionModel().select("药王茶");
-		}
-
-		if(expressBox != null)
-		{
-			expressBox.getItems().removeAll(expressBox.getItems());
-			expressBox.getItems().addAll("中国邮政","申通快递","中通快递","圆通快递","韵达快递","天天快递","汇通快递");
-			expressBox.getSelectionModel().select("中国邮政");
 		}
 
 		if(auIdField != null)
@@ -305,10 +298,10 @@ public class NewOrderController {
 	@FXML
 	private void addExpress()
 	{
-		String selectedExpress = expressBox.getSelectionModel().getSelectedItem();
+		String selectedExpress = expressBox.getText();
 		if("".equals(selectedExpress) || selectedExpress == null)
 		{
-			MessageUtil.alertInfo("请选择快递公司");
+			MessageUtil.alertInfo("请输入快递公司");
 			return;
 		}
 		selectedExpressBox.getItems().add(selectedExpress);
@@ -599,6 +592,12 @@ public class NewOrderController {
 		{
 			try {
 				sqlSession = mainApp.getSqlSession(false);
+				Order queryOrder = sqlSession.selectOne("com.xidian.model.order.OrderXml.getOrderByOrderId", order.getOrderId());
+				if(queryOrder != null)
+				{
+					MessageUtil.alertInfo("订单号已存在，请重新输入授权号，建立订单！");
+					return;
+				}
 				String productId = productIdBox.getSelectionModel().getSelectedItem();
 				order.setProductId(productId);
 				LocalDateTime startTime = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
@@ -688,7 +687,7 @@ public class NewOrderController {
 					productNumField.setText("");
 					productPriceBox.getItems().removeAll(productPriceBox.getItems());
 					rankBox.getItems().removeAll(rankBox.getItems());
-					expressBox.getSelectionModel().select("中国邮政");
+					expressBox.setText("");
 					selectedExpressBox.getItems().removeAll(selectedExpressBox.getItems());
 					receiverNameField.setText("");
 					receiverPhoneField.setText("");
