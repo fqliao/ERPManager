@@ -599,7 +599,8 @@ public class NewOrderController {
 		{
 			try {
 				sqlSession = mainApp.getSqlSession(false);
-				order.setProductId(productIdBox.getSelectionModel().getSelectedItem());
+				String productId = productIdBox.getSelectionModel().getSelectedItem();
+				order.setProductId(productId);
 				LocalDateTime startTime = LocalDateTimeUtil.parse(LocalDateTimeUtil.format(LocalDateTime.now()));
 				order.setDeliveryTime(startTime);
 
@@ -646,7 +647,7 @@ public class NewOrderController {
 						updateInfo.setAuid(order.getAuId());
 						updateInfo.setState("注册");
 						updateInfo.setRank(newRank);
-						updateInfo.setUpdateReason("提货量为："+ productNum +"，由"+oldRank+"升级为"+newRank);
+						updateInfo.setUpdateReason(productId+"提货量为："+ productNum +"，由"+oldRank+"升级为"+newRank);
 						updateInfo.setUpdateTime(now);
 
 						sqlSession.insert("com.xidian.UpdateInfoXml.addUpdateInfo", updateInfo);
